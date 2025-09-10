@@ -1,0 +1,57 @@
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Puppeteer F12 Test</title>
+            </head>
+            <body>
+                <h1>Puppeteer F12ログ収集テスト</h1>
+                <button id="error-btn">エラー発生</button>
+                <button id="warn-btn">警告発生</button>
+                <button id="info-btn">情報ログ</button>
+                <div id="output"></div>
+                
+                <script>
+                    // 即座にログを出力
+                    console.log('INFO: Puppeteerテストページが読み込まれました - ' + new Date().toISOString());
+                    console.warn('WARNING: Puppeteer警告テスト');
+                    console.error('ERROR: Puppeteerエラーテスト');
+                    console.info('INFO: 情報メッセージテスト');
+                    
+                    // ボタンイベント
+                    document.getElementById('error-btn').onclick = function() {
+                        console.log('エラーボタンがクリックされました');
+                        throw new Error('Puppeteerボタンによるエラー: ' + Math.random());
+                    };
+                    
+                    document.getElementById('warn-btn').onclick = function() {
+                        console.warn('Puppeteer警告ボタンがクリックされました');
+                    };
+                    
+                    document.getElementById('info-btn').onclick = function() {
+                        console.info('Puppeteer情報ボタンがクリックされました');
+                    };
+                    
+                    // 自動ログ生成
+                    setTimeout(() => {
+                        console.log('1秒後の自動ログ');
+                        console.error('自動エラー: ' + Math.random());
+                    }, 1000);
+                    
+                    setTimeout(() => {
+                        console.warn('2秒後の自動警告');
+                        console.info('Puppeteerテスト完了');
+                    }, 2000);
+                    
+                    // 実際のJavaScriptエラー
+                    setTimeout(() => {
+                        try {
+                            undefinedFunction();
+                        } catch(e) {
+                            console.error('実際のJSエラー:', e.message);
+                        }
+                    }, 1500);
+                </script>
+            </body>
+            </html>
+            

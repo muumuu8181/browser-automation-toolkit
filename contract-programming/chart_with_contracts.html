@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>契約プログラミングで守られたチャート</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        #chart {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ddd;
+            margin: 20px 0;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.danger {
+            background: #dc3545;
+        }
+        button.danger:hover {
+            background: #c82333;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .success {
+            color: #28a745;
+        }
+        .warning {
+            color: #ffc107;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>契約プログラミングで保護されたチャートシステム</h1>
+    
+    <div class="container">
+        <h2>正常な操作</h2>
+        <div class="controls">
+            <button onclick="chartApp.addValidData()">正常なデータ追加</button>
+            <button onclick="chartApp.changeRange('week')">週表示</button>
+            <button onclick="chartApp.changeRange('month')">月表示</button>
+            <button onclick="chartApp.zoom(1.2)">ズームイン</button>
+            <button onclick="chartApp.zoom(0.8)">ズームアウト</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>契約違反を起こす操作（AIがよくやるミス）</h2>
+        <div class="controls">
+            <button class="danger" onclick="chartApp.addInvalidData(null)">nullデータ追加</button>
+            <button class="danger" onclick="chartApp.addInvalidData(-50)">負の値追加</button>
+            <button class="danger" onclick="chartApp.addInvalidData('文字列')">文字列データ追加</button>
+            <button class="danger" onclick="chartApp.changeRange('year')">無効な期間設定</button>
+            <button class="danger" onclick="chartApp.zoom(100)">異常なズーム値</button>
+            <button class="danger" onclick="chartApp.breakDataArray()">データ配列を破壊</button>
+            <button onclick="chartApp.reset()">🔄 リセット</button>
+        </div>
+        <p><strong>※注意</strong>：「データ配列を破壊」を押すと、その後のすべての操作が契約違反になります。これが契約プログラミングの防御力です！</p>
+    </div>
+
+    <div class="container">
+        <h2>チャート</h2>
+        <div id="chart">
+            <canvas id="chartCanvas"></canvas>
+        </div>
+        <div id="status"></div>
+    </div>
+
+    <div class="container">
+        <h2>契約違反ログ</h2>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        // 契約プログラミングのユーティリティ
+        class ContractError extends Error {
+            constructor(message, type = 'precondition') {
+                super(message);
+                this.name = 'ContractError';
+                this.type = type;
+            }
+        }
+
+        function contract(condition, message, type = 'precondition') {
+            if (!condition) {
+                const error = new ContractError(message, type);
+                // ログに記録
+                logContract(error);
+                throw error;
+            }
+        }
+
+        function logContract(error) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'error';
+            entry.textContent = `[${timestamp}] ${error.type}違反: ${error.message}`;
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function logSuccess(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'success';
+            entry.textContent = `[${timestamp}] 成功: ${message}`;
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        // チャートクラス（契約プログラミング付き）
+        class ChartWithContracts {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.data = [];
+                this.range = 'week'; // week, month
+                this.zoomLevel = 1.0;
+                this.maxDataPoints = 100;
+                
+                // 初期データ
+                this.generateInitialData();
+                this._checkInvariant();
+                this.draw();
+            }
+
+            // 不変条件
+            _checkInvariant() {
+                contract(Array.isArray(this.data), 'データは配列である必要があります', 'invariant');
+                contract(this.data.length <= this.maxDataPoints, `データ数は${this.maxDataPoints}以下である必要があります`, 'invariant');
+                contract(this.zoomLevel > 0 && this.zoomLevel <= 5, 'ズームレベルは0-5の範囲内である必要があります', 'invariant');
+                contract(['week', 'month'].includes(this.range), '表示範囲はweekまたはmonthである必要があります', 'invariant');
+                
+                // すべてのデータポイントが正しい形式か
+                this.data.forEach((point, index) => {
+                    contract(
+                        point !== null && typeof point === 'object',
+                        `データポイント[${index}]はオブジェクトである必要があります`,
+                        'invariant'
+                    );
+                    contract(
+                        typeof point.value === 'number' && point.value >= 0,
+                        `データポイント[${index}]の値は0以上の数値である必要があります`,
+                        'invariant'
+                    );
+                    contract(
+                        point.date instanceof Date,
+                        `データポイント[${index}]の日付はDateオブジェクトである必要があります`,
+                        'invariant'
+                    );
+                });
+            }
+
+            generateInitialData() {
+                const now = new Date();
+                for (let i = 30; i >= 0; i--) {
+                    const date = new Date(now);
+                    date.setDate(date.getDate() - i);
+                    this.data.push({
+                        date: date,
+                        value: Math.random() * 50 + 50
+                    });
+                }
+            }
+
+            // データ追加（事前条件・事後条件付き）
+            addData(value, date = new Date()) {
+                // 事前条件
+                contract(typeof value === 'number', `値は数値である必要があります（受け取った型: ${typeof value}）`);
+                contract(value >= 0, `値は0以上である必要があります（受け取った値: ${value}）`);
+                contract(value <= 200, `値は200以下である必要があります（受け取った値: ${value}）`);
+                contract(date instanceof Date, '日付はDateオブジェクトである必要があります');
+                contract(!isNaN(date.getTime()), '有効な日付である必要があります');
+
+                const oldLength = this.data.length;
+                const oldLastValue = this.data.length > 0 ? this.data[this.data.length - 1].value : null;
+
+                // 本処理
+                this.data.push({ value, date });
+                
+                // 古いデータを削除（最大数を超えた場合）
+                if (this.data.length > this.maxDataPoints) {
+                    this.data.shift();
+                }
+
+                // 事後条件
+                contract(
+                    this.data.length <= this.maxDataPoints,
+                    'データ数が最大値を超えています',
+                    'postcondition'
+                );
+                contract(
+                    this.data.length === Math.min(oldLength + 1, this.maxDataPoints),
+                    'データ数が正しく増加していません',
+                    'postcondition'
+                );
+                contract(
+                    this.data[this.data.length - 1].value === value,
+                    '追加されたデータの値が一致しません',
+                    'postcondition'
+                );
+
+                this._checkInvariant();
+                this.draw();
+                logSuccess(`データ追加: 値=${value.toFixed(2)}`);
+            }
+
+            // 表示範囲変更
+            changeRange(newRange) {
+                // 事前条件
+                contract(
+                    ['week', 'month'].includes(newRange),
+                    `無効な表示範囲: ${newRange}（有効な値: week, month）`
+                );
+
+                const oldRange = this.range;
+
+                // 本処理
+                this.range = newRange;
+
+                // 事後条件
+                contract(this.range === newRange, '表示範囲が正しく設定されていません', 'postcondition');
+                
+                // 同じ範囲に変更の場合は事後条件をスキップ
+                if (oldRange !== newRange) {
+                    this._checkInvariant();
+                    this.draw();
+                    logSuccess(`表示範囲変更: ${oldRange} → ${newRange}`);
+                } else {
+                    logSuccess(`表示範囲維持: ${newRange}`);
+                }
+            }
+
+            // ズーム
+            zoom(factor) {
+                // 事前条件
+                contract(typeof factor === 'number', 'ズーム倍率は数値である必要があります');
+                contract(factor > 0, 'ズーム倍率は正の数である必要があります');
+                contract(factor >= 0.5 && factor <= 2.0, `ズーム倍率は0.5-2.0の範囲内である必要があります（受け取った値: ${factor}）`);
+
+                const oldZoom = this.zoomLevel;
+                const newZoom = this.zoomLevel * factor;
+
+                // 結果のズームレベルが有効範囲内かチェック
+                contract(
+                    newZoom >= 0.1 && newZoom <= 5.0,
+                    `結果のズームレベルが範囲外です: ${newZoom.toFixed(2)}`
+                );
+
+                // 本処理
+                this.zoomLevel = newZoom;
+
+                // 事後条件
+                contract(
+                    Math.abs(this.zoomLevel - oldZoom * factor) < 0.001,
+                    'ズームレベルが正しく計算されていません',
+                    'postcondition'
+                );
+
+                this._checkInvariant();
+                this.draw();
+                logSuccess(`ズーム: ${factor}倍 (新しいレベル: ${this.zoomLevel.toFixed(2)})`);
+            }
+
+            // データ取得（フィルタリング付き）
+            getFilteredData() {
+                const now = new Date();
+                let startDate = new Date(now);
+
+                if (this.range === 'week') {
+                    startDate.setDate(startDate.getDate() - 7);
+                } else if (this.range === 'month') {
+                    startDate.setDate(startDate.getDate() - 30);
+                }
+
+                const filtered = this.data.filter(d => d.date >= startDate);
+
+                // 事後条件
+                contract(Array.isArray(filtered), 'フィルタ結果は配列である必要があります', 'postcondition');
+                contract(filtered.length <= this.data.length, 'フィルタ結果が元データより多い', 'postcondition');
+
+                return filtered;
+            }
+
+            // 描画
+            draw() {
+                // キャンバスサイズ設定
+                this.canvas.width = this.canvas.offsetWidth;
+                this.canvas.height = this.canvas.offsetHeight;
+
+                const ctx = this.ctx;
+                const width = this.canvas.width;
+                const height = this.canvas.height;
+                const padding = 40;
+
+                // 背景をクリア
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, width, height);
+
+                const data = this.getFilteredData();
+                if (data.length === 0) return;
+
+                // スケール計算
+                const maxValue = Math.max(...data.map(d => d.value)) * 1.1;
+                const xScale = (width - padding * 2) / (data.length - 1) * this.zoomLevel;
+                const yScale = (height - padding * 2) / maxValue;
+
+                // 軸を描画
+                ctx.strokeStyle = '#666';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(padding, padding);
+                ctx.lineTo(padding, height - padding);
+                ctx.lineTo(width - padding, height - padding);
+                ctx.stroke();
+
+                // データを描画
+                ctx.strokeStyle = '#007bff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+
+                data.forEach((point, index) => {
+                    const x = padding + index * xScale;
+                    const y = height - padding - point.value * yScale;
+
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+
+                ctx.stroke();
+
+                // 点を描画
+                ctx.fillStyle = '#007bff';
+                data.forEach((point, index) => {
+                    const x = padding + index * xScale;
+                    const y = height - padding - point.value * yScale;
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                // ステータス更新
+                document.getElementById('status').textContent = 
+                    `表示: ${this.range} | データ数: ${data.length} | ズーム: ${this.zoomLevel.toFixed(2)}x`;
+            }
+
+            // AIがよくやるミス：データ配列を破壊
+            breakDataArray() {
+                // 契約違反を起こすコード
+                this.data = null; // AIがよくやるミス
+                this._checkInvariant(); // ここで契約違反！
+            }
+        }
+
+        // アプリケーション
+        const chartApp = {
+            chart: null,
+
+            init() {
+                this.chart = new ChartWithContracts('chartCanvas');
+            },
+
+            addValidData() {
+                const value = Math.random() * 50 + 50;
+                try {
+                    this.chart.addData(value);
+                } catch (e) {
+                    console.error(e);
+                }
+            },
+
+            addInvalidData(value) {
+                try {
+                    this.chart.addData(value);
+                } catch (e) {
+                    console.error(e);
+                }
+            },
+
+            changeRange(range) {
+                try {
+                    this.chart.changeRange(range);
+                } catch (e) {
+                    console.error(e);
+                }
+            },
+
+            zoom(factor) {
+                try {
+                    this.chart.zoom(factor);
+                } catch (e) {
+                    console.error(e);
+                }
+            },
+
+            breakDataArray() {
+                try {
+                    this.chart.breakDataArray();
+                } catch (e) {
+                    console.error(e);
+                }
+            },
+
+            reset() {
+                try {
+                    // チャートを再初期化
+                    this.chart = new ChartWithContracts('chartCanvas');
+                    logSuccess('チャートがリセットされました');
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        };
+
+        // 初期化
+        window.addEventListener('DOMContentLoaded', () => {
+            chartApp.init();
+        });
+    </script>
+</body>
+</html>

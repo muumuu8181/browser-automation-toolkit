@@ -1,0 +1,16 @@
+{
+  "name": "contract-programming-tutorial",
+  "version": "1.0.0",
+  "description": "契約プログラミング（Design by Contract）は、ソフトウェアの信頼性を高めるための手法です。 関数やメソッドの「契約」を明示的に定義し、実行時にその契約が守られていることを検証します。",
+  "main": "hello_contract.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "puppeteer-core": "^24.19.0"
+  }
+}

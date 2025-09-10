@@ -1,0 +1,80 @@
+=== Patersログインページ構造分析 ===
+
+URL: https://paters.jp/users/sign_in
+Title: paters(ペイターズ)
+
+Input要素:
+[
+  {
+    "type": "hidden",
+    "name": "authenticity_token",
+    "id": "",
+    "placeholder": "",
+    "value": "dv969Y9oJfBVYNTcNv2Ppb-TAMwHV-KsB5aAODrQL-bvgqM2Un1W2Q1fsJDizreSp728VuM9cvMIJ9H828PxQg",
+    "class": ""
+  },
+  {
+    "type": "hidden",
+    "name": "finger_printing",
+    "id": "finger_printing",
+    "placeholder": "",
+    "value": "739ff99ee03b68ab6ad26ff54d2eb5e8",
+    "class": ""
+  },
+  {
+    "type": "text",
+    "name": "user[login]",
+    "id": "mail",
+    "placeholder": "電話番号またはメールアドレスを入力",
+    "value": "",
+    "class": "form-control"
+  },
+  {
+    "type": "password",
+    "name": "user[password]",
+    "id": "password",
+    "placeholder": "パスワードを入力",
+    "value": "",
+    "class": "form-control"
+  },
+  {
+    "type": "hidden",
+    "name": "cf-turnstile-response",
+    "id": "cf-chl-widget-c0q9t_response",
+    "placeholder": "",
+    "value": "",
+    "class": ""
+  },
+  {
+    "type": "submit",
+    "name": "commit",
+    "id": "",
+    "placeholder": "",
+    "value": "ログイン",
+    "class": ""
+  },
+  {
+    "type": "text",
+    "name": "visitor_name",
+    "id": "",
+    "placeholder": "名前",
+    "value": "",
+    "class": "form-control"
+  },
+  {
+    "type": "hidden",
+    "name": "name_label",
+    "id": "",
+    "placeholder": "",
+    "value": "名前",
+    "class": ""
+  },
+  {
+    "type": "checkbox",
+    "name": "mute",
+    "id": "option_form__mute",
+    "placeholder": "",
+    "value": "on",
+    "class": ""
+  }
+]

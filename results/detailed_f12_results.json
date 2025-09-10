@@ -1,0 +1,133 @@
+{
+  "test_type": "detailed_f12_collection",
+  "success": true,
+  "chrome_version": "139.0.7258.155",
+  "chromedriver_path": "C:\\Users\\user\\AppData\\Local\\Temp\\tmpw4s5kazt\\extracted\\chromedriver-win64\\chromedriver.exe",
+  "html_file": "C:\\Users\\user\\Desktop\\work\\90_cc\\20250908\\contract-programming-tutorial\\f12_test_page.html",
+  "test_timestamp": 1757289498.9664845,
+  "console_log_count": 11,
+  "performance_log_count": 11,
+  "error_count": 4,
+  "warning_count": 3,
+  "info_count": 4,
+  "console_logs": [
+    {
+      "level": "INFO",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html 14:24 \"INFO: ページが読み込まれました - 2025-09-07T23:58:02.940Z\"",
+      "source": "console-api",
+      "timestamp": 1757289482993
+    },
+    {
+      "level": "WARNING",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html 15:24 \"WARNING: 警告テストメッセージ\"",
+      "source": "console-api",
+      "timestamp": 1757289482993
+    },
+    {
+      "level": "SEVERE",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html 16:24 \"ERROR: エラーテストメッセージ\"",
+      "source": "console-api",
+      "timestamp": 1757289482993
+    },
+    {
+      "level": "INFO",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html 36:28 \"1秒後の自動ログ\"",
+      "source": "console-api",
+      "timestamp": 1757289484376
+    },
+    {
+      "level": "SEVERE",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html 37:28 \"自動エラー: 0.645526577317576\"",
+      "source": "console-api",
+      "timestamp": 1757289484376
+    },
+    {
+      "level": "SEVERE",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html 50:32 \"実際のJSエラー:\" \"nonExistentFunction is not defined\"",
+      "source": "console-api",
+      "timestamp": 1757289484449
+    },
+    {
+      "level": "INFO",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html 20:28 \"ボタンがクリックされました\"",
+      "source": "console-api",
+      "timestamp": 1757289484474
+    },
+    {
+      "level": "SEVERE",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html 26:32 \"ボタンエラー:\" \"Cannot read properties of null (reading 'someMethod')\"",
+      "source": "console-api",
+      "timestamp": 1757289484474
+    },
+    {
+      "level": "WARNING",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html 41:28 \"2秒後の自動警告\"",
+      "source": "console-api",
+      "timestamp": 1757289484978
+    },
+    {
+      "level": "INFO",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html 42:28 \"テスト完了\"",
+      "source": "console-api",
+      "timestamp": 1757289484978
+    },
+    {
+      "level": "WARNING",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html 31:28 \"警告ボタンがクリックされました\"",
+      "source": "console-api",
+      "timestamp": 1757289485053
+    }
+  ],
+  "performance_logs": [
+    {
+      "level": "INFO",
+      "message": "{\"message\":{\"method\":\"Page.frameStartedNavigating\",\"params\":{\"frameId\":\"7E22B47C0AC605988C83503840552813\",\"loaderId\":\"B3B226DAB7FD923CFC6B6F643B9C405A\",\"navigationType\":\"differentDocument\",\"url\":\"file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html\"}},\"webview\":\"7E22B47C0AC605988C83503840552813\"}",
+      "timestamp": 1757289482827
+    },
+    {
+      "level": "INFO",
+      "message": "{\"message\":{\"method\":\"Page.frameStartedLoading\",\"params\":{\"frameId\":\"7E22B47C0AC605988C83503840552813\"}},\"webview\":\"7E22B47C0AC605988C83503840552813\"}",
+      "timestamp": 1757289482828
+    },
+    {
+      "level": "INFO",
+      "message": "{\"message\":{\"method\":\"Network.requestWillBeSent\",\"params\":{\"documentURL\":\"file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html\",\"frameId\":\"7E22B47C0AC605988C83503840552813\",\"hasUserGesture\":false,\"initiator\":{\"type\":\"other\"},\"loaderId\":\"B3B226DAB7FD923CFC6B6F643B9C405A\",\"redirectHasExtraInfo\":false,\"request\":{\"headers\":{\"sec-ch-ua\":\"\\\"Not;A=Brand\\\";v=\\\"99\\\", \\\"Google Chrome\\\";v=\\\"139\\\", \\\"Chromium\\\";v=\\\"139\\\"\",\"sec-ch-ua-mobile\":\"?0\",\"sec-ch-ua-platform\":\"\\\"Windows\\\"\"},\"initialPriority\":\"VeryHigh\",\"isSameSite\":true,\"method\":\"GET\",\"mixedContentType\":\"none\",\"referrerPolicy\":\"strict-origin-when-cross-origin\",\"url\":\"file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html\"},\"requestId\":\"B3B226DAB7FD923CFC6B6F643B9C405A\",\"timestamp\":263454.85223,\"type\":\"Document\",\"wallTime\":1757289482.821954}},\"webview\":\"7E22B47C0AC605988C83503840552813\"}",
+      "timestamp": 1757289482828
+    },
+    {
+      "level": "INFO",
+      "message": "{\"message\":{\"method\":\"Network.responseReceived\",\"params\":{\"frameId\":\"7E22B47C0AC605988C83503840552813\",\"hasExtraInfo\":false,\"loaderId\":\"B3B226DAB7FD923CFC6B6F643B9C405A\",\"requestId\":\"B3B226DAB7FD923CFC6B6F643B9C405A\",\"response\":{\"alternateProtocolUsage\":\"alternativeJobWonWithoutRace\",\"charset\":\"\",\"connectionId\":0,\"connectionReused\":false,\"encodedDataLength\":-1,\"fromDiskCache\":false,\"fromPrefetchCache\":false,\"fromServiceWorker\":false,\"headers\":{\"Content-Type\":\"text/html\",\"Last-Modified\":\"Sun, 07 Sep 2025 23:58:02 GMT\"},\"mimeType\":\"text/html\",\"protocol\":\"file\",\"remoteIPAddress\":\"\",\"remotePort\":0,\"securityState\":\"secure\",\"status\":200,\"statusText\":\"OK\",\"url\":\"file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html\"},\"timestamp\":263454.899313,\"type\":\"Document\"}},\"webview\":\"7E22B47C0AC605988C83503840552813\"}",
+      "timestamp": 1757289482875
+    },
+    {
+      "level": "INFO",
+      "message": "{\"message\":{\"method\":\"Page.frameNavigated\",\"params\":{\"frame\":{\"adFrameStatus\":{\"adFrameType\":\"none\"},\"crossOriginIsolatedContextType\":\"NotIsolated\",\"domainAndRegistry\":\"\",\"gatedAPIFeatures\":[],\"id\":\"7E22B47C0AC605988C83503840552813\",\"loaderId\":\"B3B226DAB7FD923CFC6B6F643B9C405A\",\"mimeType\":\"text/html\",\"secureContextType\":\"Secure\",\"securityOrigin\":\"file://\",\"securityOriginDetails\":{\"isLocalhost\":false},\"url\":\"file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/f12_test_page.html\"},\"type\":\"Navigation\"}},\"webview\":\"7E22B47C0AC605988C83503840552813\"}",
+      "timestamp": 1757289482879
+    },
+    {
+      "level": "INFO",
+      "message": "{\"message\":{\"method\":\"Network.policyUpdated\",\"params\":{}},\"webview\":\"7E22B47C0AC605988C83503840552813\"}",
+      "timestamp": 1757289482890
+    },
+    {
+      "level": "INFO",
+      "message": "{\"message\":{\"method\":\"Network.dataReceived\",\"params\":{\"dataLength\":2368,\"encodedDataLength\":0,\"requestId\":\"B3B226DAB7FD923CFC6B6F643B9C405A\",\"timestamp\":263454.91884}},\"webview\":\"7E22B47C0AC605988C83503840552813\"}",
+      "timestamp": 1757289482932
+    },
+    {
+      "level": "INFO",
+      "message": "{\"message\":{\"method\":\"Network.loadingFinished\",\"params\":{\"encodedDataLength\":2368,\"requestId\":\"B3B226DAB7FD923CFC6B6F643B9C405A\",\"timestamp\":263454.898542}},\"webview\":\"7E22B47C0AC605988C83503840552813\"}",
+      "timestamp": 1757289482951
+    },
+    {
+      "level": "INFO",
+      "message": "{\"message\":{\"method\":\"Page.domContentEventFired\",\"params\":{\"timestamp\":263454.978906}},\"webview\":\"7E22B47C0AC605988C83503840552813\"}",
+      "timestamp": 1757289483364
+    },
+    {
+      "level": "INFO",
+      "message": "{\"message\":{\"method\":\"Page.loadEventFired\",\"params\":{\"timestamp\":263454.980437}},\"webview\":\"7E22B47C0AC605988C83503840552813\"}",
+      "timestamp": 1757289483364
+    }
+  ]
+}

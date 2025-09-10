@@ -1,0 +1,26 @@
+=== Tetris F12 Console Logs ===
+取得日時: 20250910_125811
+総ログ数: 7
+==================================================
+
+[2025-09-10 12:58:03] WARNING
+file:///C:/Users/user/Desktop/work/90_cc/20250809/test_create-3-cli_tetris/01_CloudCode/tetris.html 1118 The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio
+------------------------------
+[2025-09-10 12:58:10] INFO
+console-api 3:24 "[TETRIS] ゲーム状態チェック"
+------------------------------
+[2025-09-10 12:58:10] WARNING
+console-api 4:24 "[TETRIS] 警告: テストメッセージ"
+------------------------------
+[2025-09-10 12:58:10] SEVERE
+console-api 5:24 "[TETRIS] エラー: これはテストエラーです"
+------------------------------
+[2025-09-10 12:58:10] INFO
+console-api 6:24 "[TETRIS] 情報: F12ログ取得テスト中"
+------------------------------
+[2025-09-10 12:58:10] INFO
+console-api 10:28 "[TETRIS] 現在のスコア:" 57
+------------------------------
+[2025-09-10 12:58:10] INFO
+console-api 13:28 "[TETRIS] 現在のレベル:" 1
+------------------------------

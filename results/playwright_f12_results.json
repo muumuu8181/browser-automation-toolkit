@@ -1,0 +1,106 @@
+{
+  "tool": "playwright",
+  "success": true,
+  "timestamp": 1757290933.2780232,
+  "html_file": "C:\\Users\\user\\Desktop\\work\\90_cc\\20250908\\contract-programming-tutorial\\playwright_test_page.html",
+  "total_logs": 13,
+  "analysis": {
+    "console": 12,
+    "jsErrors": 1,
+    "networkErrors": 0,
+    "httpErrors": 0
+  },
+  "logs": [
+    {
+      "type": "console",
+      "level": "log",
+      "text": "INFO: Playwrightテストページが読み込まれました - 2025-09-08T00:22:08.049Z",
+      "timestamp": 1757290928.0576022,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "warning",
+      "text": "WARNING: Playwright警告テスト",
+      "timestamp": 1757290928.0576022,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "text": "ERROR: Playwrightエラーテスト",
+      "timestamp": 1757290928.0576022,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "info",
+      "text": "INFO: Playwright情報メッセージテスト",
+      "timestamp": 1757290928.0596168,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "log",
+      "text": "Playwrightエラーボタンがクリックされました",
+      "timestamp": 1757290928.6603808,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "javascript_error",
+      "level": "error",
+      "text": "Playwrightボタンによるエラー: 0.180402811348232",
+      "timestamp": 1757290928.662408,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "log",
+      "text": "1秒後のPlaywright自動ログ",
+      "timestamp": 1757290929.0642817,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "text": "自動エラー: 0.9555439696104293",
+      "timestamp": 1757290929.0647907,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "warning",
+      "text": "Playwright警告ボタンがクリックされました",
+      "timestamp": 1757290929.2067351,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "text": "Playwright実際のJSエラー: playwrightUndefinedFunction is not defined",
+      "timestamp": 1757290929.5660927,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "info",
+      "text": "Playwright情報ボタンがクリックされました",
+      "timestamp": 1757290929.738592,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "warning",
+      "text": "2秒後のPlaywright自動警告",
+      "timestamp": 1757290930.0627735,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "info",
+      "text": "Playwrightテスト完了",
+      "timestamp": 1757290930.0627735,
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/playwright_test_page.html"
+    }
+  ]
+}

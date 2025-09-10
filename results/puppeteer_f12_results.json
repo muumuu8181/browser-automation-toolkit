@@ -1,0 +1,107 @@
+{
+  "tool": "puppeteer",
+  "success": true,
+  "timestamp": "2025-09-08T00:17:32.717Z",
+  "html_file": "C:\\Users\\user\\Desktop\\work\\90_cc\\20250908\\contract-programming-tutorial\\puppeteer_test_page.html",
+  "total_logs": 13,
+  "analysis": {
+    "console": 12,
+    "jsErrors": 1,
+    "networkErrors": 0,
+    "httpErrors": 0
+  },
+  "logs": [
+    {
+      "type": "console",
+      "level": "log",
+      "text": "INFO: Puppeteerテストページが読み込まれました - 2025-09-08T00:17:27.212Z",
+      "timestamp": "2025-09-08T00:17:27.220Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "warn",
+      "text": "WARNING: Puppeteer警告テスト",
+      "timestamp": "2025-09-08T00:17:27.224Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "text": "ERROR: Puppeteerエラーテスト",
+      "timestamp": "2025-09-08T00:17:27.225Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "info",
+      "text": "INFO: 情報メッセージテスト",
+      "timestamp": "2025-09-08T00:17:27.226Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "log",
+      "text": "エラーボタンがクリックされました",
+      "timestamp": "2025-09-08T00:17:28.131Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "javascript_error",
+      "level": "error",
+      "text": "Puppeteerボタンによるエラー: 0.17242775344030759",
+      "stack": "Error: Puppeteerボタンによるエラー: 0.17242775344030759\n    at document.getElementById.onclick (file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html:24:31)",
+      "timestamp": "2025-09-08T00:17:28.133Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "log",
+      "text": "1秒後の自動ログ",
+      "timestamp": "2025-09-08T00:17:28.215Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "text": "自動エラー: 0.5534675497180875",
+      "timestamp": "2025-09-08T00:17:28.215Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "warn",
+      "text": "Puppeteer警告ボタンがクリックされました",
+      "timestamp": "2025-09-08T00:17:28.666Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "text": "実際のJSエラー: undefinedFunction is not defined",
+      "timestamp": "2025-09-08T00:17:28.720Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "info",
+      "text": "Puppeteer情報ボタンがクリックされました",
+      "timestamp": "2025-09-08T00:17:29.197Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "warn",
+      "text": "2秒後の自動警告",
+      "timestamp": "2025-09-08T00:17:29.218Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    },
+    {
+      "type": "console",
+      "level": "info",
+      "text": "Puppeteerテスト完了",
+      "timestamp": "2025-09-08T00:17:29.219Z",
+      "url": "file:///C:/Users/user/Desktop/work/90_cc/20250908/contract-programming-tutorial/puppeteer_test_page.html"
+    }
+  ]
+}

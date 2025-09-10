@@ -1,0 +1,42 @@
+{
+  "game": "Tetris",
+  "timestamp": "20250910_125811",
+  "total_logs": 7,
+  "logs": [
+    {
+      "timestamp": "2025-09-10 12:58:03",
+      "level": "WARNING",
+      "message": "file:///C:/Users/user/Desktop/work/90_cc/20250809/test_create-3-cli_tetris/01_CloudCode/tetris.html 1118 The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio"
+    },
+    {
+      "timestamp": "2025-09-10 12:58:10",
+      "level": "INFO",
+      "message": "console-api 3:24 \"[TETRIS] ゲーム状態チェック\""
+    },
+    {
+      "timestamp": "2025-09-10 12:58:10",
+      "level": "WARNING",
+      "message": "console-api 4:24 \"[TETRIS] 警告: テストメッセージ\""
+    },
+    {
+      "timestamp": "2025-09-10 12:58:10",
+      "level": "SEVERE",
+      "message": "console-api 5:24 \"[TETRIS] エラー: これはテストエラーです\""
+    },
+    {
+      "timestamp": "2025-09-10 12:58:10",
+      "level": "INFO",
+      "message": "console-api 6:24 \"[TETRIS] 情報: F12ログ取得テスト中\""
+    },
+    {
+      "timestamp": "2025-09-10 12:58:10",
+      "level": "INFO",
+      "message": "console-api 10:28 \"[TETRIS] 現在のスコア:\" 57"
+    },
+    {
+      "timestamp": "2025-09-10 12:58:10",
+      "level": "INFO",
+      "message": "console-api 13:28 \"[TETRIS] 現在のレベル:\" 1"
+    }
+  ]
+}
