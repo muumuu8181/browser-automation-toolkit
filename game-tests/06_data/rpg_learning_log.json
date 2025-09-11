@@ -1,0 +1,381 @@
+[
+  {
+    "episode": 1,
+    "timestamp": "2025-09-11T10:06:38.017310",
+    "duration": 2.9827122688293457,
+    "final_score": 0,
+    "final_hp": 0,
+    "final_mp": 50,
+    "enemies_remaining": 6,
+    "actions_taken": 11,
+    "action_distribution": {
+      "move": 7,
+      "attack": 4,
+      "special": 0
+    },
+    "state_history": [
+      {
+        "time": 0.01888728141784668,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.21864604949951172,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.5380291938781738,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.9065341949462891,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.1112391948699951,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.440058708190918,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.6226131916046143,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.894460678100586,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 2.081737518310547,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 6
+      },
+      {
+        "time": 2.3719983100891113,
+        "hp": 78,
+        "mp": 50,
+        "score": 0,
+        "enemies": 6
+      },
+      {
+        "time": 2.674898624420166,
+        "hp": 32,
+        "mp": 50,
+        "score": 0,
+        "enemies": 6
+      },
+      {
+        "time": 2.972234010696411,
+        "hp": 0,
+        "mp": 50,
+        "score": 0,
+        "enemies": 6
+      }
+    ]
+  },
+  {
+    "episode": 1,
+    "timestamp": "2025-09-11T10:06:51.293674",
+    "duration": 2.9187655448913574,
+    "final_score": 0,
+    "final_hp": 0,
+    "final_mp": 50,
+    "enemies_remaining": 6,
+    "actions_taken": 10,
+    "action_distribution": {
+      "move": 7,
+      "attack": 1,
+      "special": 2
+    },
+    "state_history": [
+      {
+        "time": 0.01542973518371582,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.2023637294769287,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.5220832824707031,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.9532735347747803,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.2607998847961426,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.448408842086792,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.7480206489562988,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 2.0887749195098877,
+        "hp": 99,
+        "mp": 50,
+        "score": 0,
+        "enemies": 6
+      },
+      {
+        "time": 2.4169692993164062,
+        "hp": 49,
+        "mp": 50,
+        "score": 0,
+        "enemies": 6
+      },
+      {
+        "time": 2.602220058441162,
+        "hp": 13,
+        "mp": 50,
+        "score": 0,
+        "enemies": 6
+      },
+      {
+        "time": 2.9035391807556152,
+        "hp": 0,
+        "mp": 50,
+        "score": 0,
+        "enemies": 6
+      }
+    ]
+  },
+  {
+    "episode": 2,
+    "timestamp": "2025-09-11T10:07:02.954882",
+    "duration": 0.9306817054748535,
+    "final_score": 0,
+    "final_hp": 0,
+    "final_mp": 50,
+    "enemies_remaining": 5,
+    "actions_taken": 3,
+    "action_distribution": {
+      "move": 2,
+      "attack": 1,
+      "special": 0
+    },
+    "state_history": [
+      {
+        "time": 0.022735595703125,
+        "hp": 48,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.3751647472381592,
+        "hp": 27,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.7164766788482666,
+        "hp": 6,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.9152517318725586,
+        "hp": 0,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      }
+    ]
+  },
+  {
+    "episode": 3,
+    "timestamp": "2025-09-11T10:07:14.449204",
+    "duration": 1.3599252700805664,
+    "final_score": 0,
+    "final_hp": 0,
+    "final_mp": 50,
+    "enemies_remaining": 5,
+    "actions_taken": 4,
+    "action_distribution": {
+      "move": 4,
+      "attack": 0,
+      "special": 0
+    },
+    "state_history": [
+      {
+        "time": 0.02069997787475586,
+        "hp": 80,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.32389116287231445,
+        "hp": 61,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.6301205158233643,
+        "hp": 43,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.0146963596343994,
+        "hp": 20,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.3435707092285156,
+        "hp": 0,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      }
+    ]
+  },
+  {
+    "episode": 4,
+    "timestamp": "2025-09-11T10:07:27.585770",
+    "duration": 2.839294910430908,
+    "final_score": 0,
+    "final_hp": 0,
+    "final_mp": 50,
+    "enemies_remaining": 6,
+    "actions_taken": 9,
+    "action_distribution": {
+      "move": 7,
+      "attack": 1,
+      "special": 1
+    },
+    "state_history": [
+      {
+        "time": 0.015738964080810547,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.3139314651489258,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.6289513111114502,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 0.8693554401397705,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.2390801906585693,
+        "hp": 100,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.5876975059509277,
+        "hp": 85,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 1.9408047199249268,
+        "hp": 62,
+        "mp": 50,
+        "score": 0,
+        "enemies": 5
+      },
+      {
+        "time": 2.259089469909668,
+        "hp": 44,
+        "mp": 50,
+        "score": 0,
+        "enemies": 6
+      },
+      {
+        "time": 2.492703676223755,
+        "hp": 18,
+        "mp": 50,
+        "score": 0,
+        "enemies": 6
+      },
+      {
+        "time": 2.8184218406677246,
+        "hp": 0,
+        "mp": 50,
+        "score": 0,
+        "enemies": 6
+      }
+    ]
+  }
+]

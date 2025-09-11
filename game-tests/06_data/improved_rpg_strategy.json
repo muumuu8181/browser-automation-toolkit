@@ -1,0 +1,13 @@
+{
+  "episode": 3,
+  "best_score": 0,
+  "total_kills": 0,
+  "attack_frequency": 0.4,
+  "move_frequency": 0.5,
+  "special_frequency": 0.1,
+  "preferred_distance": 199.65000000000003,
+  "dodge_threshold": 106.48000000000002,
+  "attack_accuracy": 0.6001624999999999,
+  "movement_speed": 0.17364375000000004,
+  "reaction_time": 0.05
+}

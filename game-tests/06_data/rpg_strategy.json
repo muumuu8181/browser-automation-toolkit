@@ -1,0 +1,16 @@
+{
+  "episode": 4,
+  "best_score": 0,
+  "attack_frequency": 0.2,
+  "move_frequency": 0.7,
+  "special_frequency": 0.1,
+  "preferred_distance": 200,
+  "dodge_threshold": 100,
+  "mp_threshold": 30,
+  "movement_patterns": {
+    "circle": 0.25,
+    "zigzag": 0.25,
+    "random": 0.25,
+    "chase": 0.25
+  }
+}

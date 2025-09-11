@@ -1,0 +1,14 @@
+{
+  "sessions": [
+    {
+      "timestamp": "2025-09-11T14:26:02.652519",
+      "stages_cleared": 0,
+      "total_time": 0.41397571563720703,
+      "enemy_collisions": 0
+    }
+  ],
+  "total_stages": 0,
+  "total_steps": 0,
+  "enemy_collisions": 0,
+  "stage_attempts": []
+}

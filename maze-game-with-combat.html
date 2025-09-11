@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>迷路ゲーム - 戦闘システム版</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #222;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        
+        .game-container {
+            text-align: center;
+        }
+        
+        canvas {
+            border: 3px solid #fff;
+            background-color: #000;
+        }
+        
+        .info {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        
+        .controls {
+            margin-top: 10px;
+            color: #0f0;
+        }
+        
+        .health {
+            color: #ff0;
+            font-weight: bold;
+        }
+        
+        .attack-status {
+            color: #f80;
+            font-weight: bold;
+        }
+        
+        .score {
+            color: #0ff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>迷路ゲーム - 戦闘システム版</h1>
+        <canvas id="gameCanvas" width="500" height="500"></canvas>
+        <div class="info">
+            <div>ステップ数: <span id="steps">0</span></div>
+            <div>ステージ: <span id="stage">1</span></div>
+            <div class="health">ライフ: <span id="health">5</span></div>
+            <div class="attack-status">攻撃力: <span id="attackPower">1</span> | 攻撃回数: <span id="attackCount">3</span></div>
+            <div class="score">スコア: <span id="score">0</span></div>
+        </div>
+        <div class="controls">
+            操作: 矢印キー または WASD<br>
+            スペースキー: 向いている方向に攻撃<br>
+            Xキー: 周囲全体攻撃（1ステージ1回）
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // ゲーム設定
+        const CELL_SIZE = 25;
+        const MAZE_WIDTH = 20;
+        const MAZE_HEIGHT = 20;
+        
+        // ゲーム状態
+        const game = {
+            player: { 
+                x: 1, 
+                y: 1,
+                direction: 'right', // 向いている方向
+                attackPower: 1,
+                attacksRemaining: 3,
+                specialAttackUsed: false
+            },
+            goal: { x: 18, y: 18 },
+            enemies: [],
+            items: [],
+            steps: 0,
+            stage: 1,
+            health: 5,
+            score: 0,
+            maze: [],
+            keys: {},
+            gameOver: false,
+            effects: [] // 視覚効果用
+        };
+        
+        // 敵クラス
+        class Enemy {
+            constructor(x, y, type = 'basic') {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.health = this.getHealthByType();
+                this.maxHealth = this.health;
+                this.color = this.getColorByType();
+                this.moveInterval = this.getMoveIntervalByType();
+                this.lastMove = Date.now();
+                this.value = this.getValueByType(); // 倒した時のスコア
+            }
+            
+            getHealthByType() {
+                switch(this.type) {
+                    case 'basic': return 1;
+                    case 'strong': return 2;
+                    case 'boss': return 3;
+                    default: return 1;
+                }
+            }
+            
+            getColorByType() {
+                switch(this.type) {
+                    case 'basic': return '#f00';
+                    case 'strong': return '#f0f';
+                    case 'boss': return '#fa0';
+                    default: return '#f00';
+                }
+            }
+            
+            getMoveIntervalByType() {
+                switch(this.type) {
+                    case 'basic': return 800;
+                    case 'strong': return 600;
+                    case 'boss': return 1000;
+                    default: return 800;
+                }
+            }
+            
+            getValueByType() {
+                switch(this.type) {
+                    case 'basic': return 10;
+                    case 'strong': return 20;
+                    case 'boss': return 50;
+                    default: return 10;
+                }
+            }
+            
+            update() {
+                const now = Date.now();
+                if (now - this.lastMove < this.moveInterval) return;
+                
+                this.lastMove = now;
+                
+                // プレイヤーに向かって移動
+                const dx = Math.sign(game.player.x - this.x);
+                const dy = Math.sign(game.player.y - this.y);
+                
+                // ランダムに縦横どちらを優先するか決める
+                if (Math.random() < 0.5 && dx !== 0) {
+                    if (!this.tryMove(dx, 0)) {
+                        this.tryMove(0, dy);
+                    }
+                } else if (dy !== 0) {
+                    if (!this.tryMove(0, dy)) {
+                        this.tryMove(dx, 0);
+                    }
+                } else {
+                    this.tryMove(dx, 0);
+                }
+            }
+            
+            tryMove(dx, dy) {
+                const newX = this.x + dx;
+                const newY = this.y + dy;
+                
+                if (newX >= 0 && newX < MAZE_WIDTH && 
+                    newY >= 0 && newY < MAZE_HEIGHT && 
+                    game.maze[newY][newX] === 0) {
+                    
+                    // 他の敵との衝突チェック
+                    const collision = game.enemies.some(e => 
+                        e !== this && e.x === newX && e.y === newY
+                    );
+                    
+                    if (!collision) {
+                        this.x = newX;
+                        this.y = newY;
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            takeDamage(damage) {
+                this.health -= damage;
+                if (this.health <= 0) {
+                    game.score += this.value;
+                    return true; // 死亡
+                }
+                return false;
+            }
+        }
+        
+        // アイテムクラス
+        class Item {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.collected = false;
+            }
+            
+            collect() {
+                if (this.collected) return;
+                
+                this.collected = true;
+                switch(this.type) {
+                    case 'heart':
+                        game.health = Math.min(game.health + 2, 10);
+                        console.log('[ITEM] ハート獲得！ ライフ+2');
+                        break;
+                    case 'power':
+                        game.player.attackPower += 1;
+                        console.log('[ITEM] パワーアップ！ 攻撃力+1');
+                        break;
+                    case 'ammo':
+                        game.player.attacksRemaining += 5;
+                        console.log('[ITEM] 弾薬獲得！ 攻撃回数+5');
+                        break;
+                }
+            }
+        }
+        
+        // 視覚効果クラス
+        class Effect {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.time = 0;
+                this.duration = 300; // ミリ秒
+                this.created = Date.now();
+            }
+            
+            update() {
+                this.time = Date.now() - this.created;
+                return this.time < this.duration;
+            }
+            
+            render() {
+                const progress = this.time / this.duration;
+                const alpha = 1 - progress;
+                
+                switch(this.type) {
+                    case 'attack':
+                        ctx.strokeStyle = `rgba(255, 100, 0, ${alpha})`;
+                        ctx.lineWidth = 3;
+                        ctx.strokeRect(
+                            this.x * CELL_SIZE + 5,
+                            this.y * CELL_SIZE + 5,
+                            CELL_SIZE - 10,
+                            CELL_SIZE - 10
+                        );
+                        break;
+                    case 'special':
+                        ctx.fillStyle = `rgba(255, 255, 0, ${alpha * 0.3})`;
+                        ctx.beginPath();
+                        ctx.arc(
+                            this.x * CELL_SIZE + CELL_SIZE/2,
+                            this.y * CELL_SIZE + CELL_SIZE/2,
+                            CELL_SIZE * 2 * (1 - progress),
+                            0, Math.PI * 2
+                        );
+                        ctx.fill();
+                        break;
+                }
+            }
+        }
+        
+        // 迷路生成
+        function generateMaze() {
+            // 初期化
+            game.maze = [];
+            for (let y = 0; y < MAZE_HEIGHT; y++) {
+                game.maze[y] = [];
+                for (let x = 0; x < MAZE_WIDTH; x++) {
+                    game.maze[y][x] = 1;
+                }
+            }
+            
+            // 迷路生成アルゴリズム
+            const stack = [{x: 1, y: 1}];
+            game.maze[1][1] = 0;
+            
+            while (stack.length > 0) {
+                const current = stack[stack.length - 1];
+                const directions = [
+                    {dx: 2, dy: 0}, {dx: -2, dy: 0},
+                    {dx: 0, dy: 2}, {dx: 0, dy: -2}
+                ];
+                
+                // シャッフル
+                for (let i = directions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [directions[i], directions[j]] = [directions[j], directions[i]];
+                }
+                
+                let found = false;
+                for (const dir of directions) {
+                    const nx = current.x + dir.dx;
+                    const ny = current.y + dir.dy;
+                    
+                    if (nx > 0 && nx < MAZE_WIDTH - 1 && 
+                        ny > 0 && ny < MAZE_HEIGHT - 1 && 
+                        game.maze[ny][nx] === 1) {
+                        
+                        game.maze[ny][nx] = 0;
+                        game.maze[current.y + dir.dy/2][current.x + dir.dx/2] = 0;
+                        
+                        stack.push({x: nx, y: ny});
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    stack.pop();
+                }
+            }
+            
+            // ゴールへの道を確保
+            game.maze[18][18] = 0;
+            game.maze[17][18] = 0;
+            game.maze[18][17] = 0;
+            
+            // 追加の通路
+            for (let i = 0; i < 10; i++) {
+                const x = Math.floor(Math.random() * (MAZE_WIDTH - 2)) + 1;
+                const y = Math.floor(Math.random() * (MAZE_HEIGHT - 2)) + 1;
+                game.maze[y][x] = 0;
+            }
+            
+            // 敵とアイテムを配置
+            placeEnemies();
+            placeItems();
+        }
+        
+        // 敵配置
+        function placeEnemies() {
+            game.enemies = [];
+            const enemyCount = 3 + Math.floor(game.stage / 2);
+            
+            for (let i = 0; i < enemyCount; i++) {
+                let placed = false;
+                let attempts = 0;
+                
+                while (!placed && attempts < 100) {
+                    const x = Math.floor(Math.random() * MAZE_WIDTH);
+                    const y = Math.floor(Math.random() * MAZE_HEIGHT);
+                    
+                    if (game.maze[y][x] === 0 && 
+                        !(x === game.player.x && y === game.player.y) &&
+                        !(x === game.goal.x && y === game.goal.y) &&
+                        (Math.abs(x - game.player.x) > 3 || Math.abs(y - game.player.y) > 3)) {
+                        
+                        let type = 'basic';
+                        if (game.stage >= 3 && i === 0) {
+                            type = 'boss';
+                        } else if (game.stage >= 2 && i % 2 === 0) {
+                            type = 'strong';
+                        }
+                        
+                        game.enemies.push(new Enemy(x, y, type));
+                        placed = true;
+                    }
+                    attempts++;
+                }
+            }
+        }
+        
+        // アイテム配置
+        function placeItems() {
+            game.items = [];
+            const itemCount = 2 + Math.floor(game.stage / 3);
+            
+            for (let i = 0; i < itemCount; i++) {
+                let placed = false;
+                let attempts = 0;
+                
+                while (!placed && attempts < 100) {
+                    const x = Math.floor(Math.random() * MAZE_WIDTH);
+                    const y = Math.floor(Math.random() * MAZE_HEIGHT);
+                    
+                    if (game.maze[y][x] === 0 && 
+                        !(x === game.player.x && y === game.player.y) &&
+                        !(x === game.goal.x && y === game.goal.y)) {
+                        
+                        const types = ['heart', 'power', 'ammo'];
+                        const type = types[Math.floor(Math.random() * types.length)];
+                        
+                        game.items.push(new Item(x, y, type));
+                        placed = true;
+                    }
+                    attempts++;
+                }
+            }
+        }
+        
+        // プレイヤー移動
+        function movePlayer(dx, dy) {
+            if (game.gameOver || game.player.attacksRemaining <= 0) return;
+            
+            const newX = game.player.x + dx;
+            const newY = game.player.y + dy;
+            
+            // 方向を更新
+            if (dx > 0) game.player.direction = 'right';
+            else if (dx < 0) game.player.direction = 'left';
+            else if (dy > 0) game.player.direction = 'down';
+            else if (dy < 0) game.player.direction = 'up';
+            
+            // 移動可能かチェック
+            if (newX >= 0 && newX < MAZE_WIDTH && 
+                newY >= 0 && newY < MAZE_HEIGHT && 
+                game.maze[newY][newX] === 0) {
+                
+                game.player.x = newX;
+                game.player.y = newY;
+                game.steps++;
+                
+                // アイテム取得チェック
+                for (const item of game.items) {
+                    if (!item.collected && item.x === newX && item.y === newY) {
+                        item.collect();
+                    }
+                }
+                
+                // ゴール判定
+                if (game.player.x === game.goal.x && game.player.y === game.goal.y) {
+                    const bonus = game.player.attacksRemaining * 10;
+                    game.score += bonus;
+                    alert(`クリア！ ステップ数: ${game.steps}\nボーナス: ${bonus}点`);
+                    nextStage();
+                }
+            }
+        }
+        
+        // 攻撃
+        function attack() {
+            if (game.player.attacksRemaining <= 0) {
+                console.log('[ATTACK] 攻撃回数が0です！');
+                return;
+            }
+            
+            game.player.attacksRemaining--;
+            
+            // 攻撃方向を決定
+            let targetX = game.player.x;
+            let targetY = game.player.y;
+            
+            switch(game.player.direction) {
+                case 'right': targetX++; break;
+                case 'left': targetX--; break;
+                case 'down': targetY++; break;
+                case 'up': targetY--; break;
+            }
+            
+            // エフェクト追加
+            game.effects.push(new Effect(targetX, targetY, 'attack'));
+            
+            // 敵にダメージ
+            for (let i = game.enemies.length - 1; i >= 0; i--) {
+                const enemy = game.enemies[i];
+                if (enemy.x === targetX && enemy.y === targetY) {
+                    if (enemy.takeDamage(game.player.attackPower)) {
+                        console.log(`[KILL] ${enemy.type}を倒した！ +${enemy.value}点`);
+                        game.enemies.splice(i, 1);
+                    }
+                }
+            }
+        }
+        
+        // 全体攻撃
+        function specialAttack() {
+            if (game.player.specialAttackUsed) {
+                console.log('[SPECIAL] このステージでは使用済みです！');
+                return;
+            }
+            
+            game.player.specialAttackUsed = true;
+            
+            // エフェクト
+            game.effects.push(new Effect(game.player.x, game.player.y, 'special'));
+            
+            // 周囲3マスの敵にダメージ
+            for (let i = game.enemies.length - 1; i >= 0; i--) {
+                const enemy = game.enemies[i];
+                const dist = Math.abs(enemy.x - game.player.x) + Math.abs(enemy.y - game.player.y);
+                
+                if (dist <= 3) {
+                    if (enemy.takeDamage(2)) {
+                        console.log(`[SPECIAL KILL] ${enemy.type}を倒した！ +${enemy.value}点`);
+                        game.enemies.splice(i, 1);
+                    }
+                }
+            }
+        }
+        
+        // 次ステージ
+        function nextStage() {
+            game.stage++;
+            game.steps = 0;
+            game.player.x = 1;
+            game.player.y = 1;
+            game.player.attacksRemaining = Math.min(game.player.attacksRemaining + 3, 10);
+            game.player.specialAttackUsed = false;
+            game.health = Math.min(game.health + 1, 10);
+            generateMaze();
+        }
+        
+        // 衝突チェック
+        function checkCollisions() {
+            for (const enemy of game.enemies) {
+                if (enemy.x === game.player.x && enemy.y === game.player.y) {
+                    game.health--;
+                    console.log('[HIT] ダメージ！ 残りライフ:', game.health);
+                    
+                    if (game.health <= 0) {
+                        game.gameOver = true;
+                        alert(`ゲームオーバー！\nステージ: ${game.stage}\nスコア: ${game.score}`);
+                        resetGame();
+                    } else {
+                        // ノックバック
+                        game.player.x = 1;
+                        game.player.y = 1;
+                    }
+                    break;
+                }
+            }
+        }
+        
+        // リセット
+        function resetGame() {
+            game.stage = 1;
+            game.steps = 0;
+            game.health = 5;
+            game.score = 0;
+            game.player = {
+                x: 1,
+                y: 1,
+                direction: 'right',
+                attackPower: 1,
+                attacksRemaining: 3,
+                specialAttackUsed: false
+            };
+            game.gameOver = false;
+            generateMaze();
+        }
+        
+        // ゲームループ
+        function gameLoop() {
+            // 敵更新
+            for (const enemy of game.enemies) {
+                enemy.update();
+            }
+            
+            // エフェクト更新
+            game.effects = game.effects.filter(e => e.update());
+            
+            // 衝突チェック
+            checkCollisions();
+            
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 描画
+        function render() {
+            // 背景
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 迷路
+            for (let y = 0; y < MAZE_HEIGHT; y++) {
+                for (let x = 0; x < MAZE_WIDTH; x++) {
+                    if (game.maze[y][x] === 1) {
+                        ctx.fillStyle = '#666';
+                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    } else {
+                        ctx.fillStyle = '#222';
+                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    }
+                }
+            }
+            
+            // アイテム
+            for (const item of game.items) {
+                if (item.collected) continue;
+                
+                switch(item.type) {
+                    case 'heart':
+                        ctx.fillStyle = '#f44';
+                        ctx.fillRect(item.x * CELL_SIZE + 8, item.y * CELL_SIZE + 8, 9, 9);
+                        break;
+                    case 'power':
+                        ctx.fillStyle = '#ff0';
+                        ctx.fillRect(item.x * CELL_SIZE + 7, item.y * CELL_SIZE + 7, 11, 11);
+                        break;
+                    case 'ammo':
+                        ctx.fillStyle = '#4ff';
+                        ctx.fillRect(item.x * CELL_SIZE + 9, item.y * CELL_SIZE + 5, 7, 15);
+                        break;
+                }
+            }
+            
+            // ゴール
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(game.goal.x * CELL_SIZE + 5, game.goal.y * CELL_SIZE + 5, 
+                        CELL_SIZE - 10, CELL_SIZE - 10);
+            
+            // 敵
+            for (const enemy of game.enemies) {
+                ctx.fillStyle = enemy.color;
+                ctx.beginPath();
+                ctx.arc(enemy.x * CELL_SIZE + CELL_SIZE/2, 
+                       enemy.y * CELL_SIZE + CELL_SIZE/2, 
+                       CELL_SIZE/3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // HP表示
+                if (enemy.health < enemy.maxHealth) {
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(enemy.x * CELL_SIZE + 5, enemy.y * CELL_SIZE - 5, 15, 3);
+                    ctx.fillStyle = '#0f0';
+                    ctx.fillRect(enemy.x * CELL_SIZE + 5, enemy.y * CELL_SIZE - 5, 
+                                15 * (enemy.health / enemy.maxHealth), 3);
+                }
+            }
+            
+            // プレイヤー
+            ctx.fillStyle = game.player.attacksRemaining > 0 ? '#ff0' : '#888';
+            ctx.beginPath();
+            ctx.arc(game.player.x * CELL_SIZE + CELL_SIZE/2, 
+                   game.player.y * CELL_SIZE + CELL_SIZE/2, 
+                   CELL_SIZE/3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // プレイヤーの向き
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            const px = game.player.x * CELL_SIZE + CELL_SIZE/2;
+            const py = game.player.y * CELL_SIZE + CELL_SIZE/2;
+            
+            switch(game.player.direction) {
+                case 'right':
+                    ctx.moveTo(px + 5, py);
+                    ctx.lineTo(px + 10, py);
+                    break;
+                case 'left':
+                    ctx.moveTo(px - 5, py);
+                    ctx.lineTo(px - 10, py);
+                    break;
+                case 'down':
+                    ctx.moveTo(px, py + 5);
+                    ctx.lineTo(px, py + 10);
+                    break;
+                case 'up':
+                    ctx.moveTo(px, py - 5);
+                    ctx.lineTo(px, py - 10);
+                    break;
+            }
+            ctx.stroke();
+            
+            // エフェクト
+            for (const effect of game.effects) {
+                effect.render();
+            }
+            
+            // UI更新
+            document.getElementById('steps').textContent = game.steps;
+            document.getElementById('stage').textContent = game.stage;
+            document.getElementById('health').textContent = game.health;
+            document.getElementById('attackPower').textContent = game.player.attackPower;
+            document.getElementById('attackCount').textContent = game.player.attacksRemaining;
+            document.getElementById('score').textContent = game.score;
+        }
+        
+        // キー入力
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    movePlayer(0, -1);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    movePlayer(0, 1);
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    movePlayer(-1, 0);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    movePlayer(1, 0);
+                    break;
+                case ' ':
+                    attack();
+                    break;
+                case 'x':
+                case 'X':
+                    specialAttack();
+                    break;
+            }
+        });
+        
+        // ゲーム開始
+        generateMaze();
+        console.log('[MAZE] ゲーム開始！戦闘システム版');
+        console.log('[MAZE] スペースキー: 攻撃, Xキー: 全体攻撃');
+        gameLoop();
+    </script>
+</body>
+</html>

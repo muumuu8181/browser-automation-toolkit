@@ -1,0 +1,38 @@
+[2025-09-11 14:25:57.362] [SYSTEM] ブラウザ起動中
+[2025-09-11 14:26:00.292] [SYSTEM] ブラウザ起動完了
+[2025-09-11 14:26:00.292] [GAME] ゲームファイルを開く: C:\Users\user\Desktop\work\90_cc\20250908\browser-automation-toolkit\maze-game-with-enemies.html
+[2025-09-11 14:26:02.238] [GAME] ゲーム読み込み完了
+[2025-09-11 14:26:02.238] [START] === 敵対応迷路ソルバー ===
+[2025-09-11 14:26:02.238] [START] 自動プレイ開始: 最大3ステージ
+[2025-09-11 14:26:02.264] [STAGE] ステージ 1 開始
+[2025-09-11 14:26:02.264] [INFO] プレイヤー位置: (1, 1), ゴール位置: (18, 18)
+[2025-09-11 14:26:02.264] [INFO] 敵の数: 2, ライフ: 3
+[2025-09-11 14:26:02.264] [SOLVER] 経路発見: 78ステップ, 探索時間: 0.000秒
+[2025-09-11 14:26:02.289] [VISUAL] パス描画完了: 78ステップ
+[2025-09-11 14:26:02.651] [ERROR] エラー発生: Message: element not interactable
+  (Session info: chrome=140.0.7339.81); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementnotinteractableexception
+Stacktrace:
+	GetHandleVerifier [0x0x7ff78673fc95+79861]
+	GetHandleVerifier [0x0x7ff78673fcf0+79952]
+	(No symbol) [0x0x7ff7864bc8fc]
+	(No symbol) [0x0x7ff78650d9d3]
+	(No symbol) [0x0x7ff78650b7f0]
+	(No symbol) [0x0x7ff78653cada]
+	(No symbol) [0x0x7ff786506bc6]
+	(No symbol) [0x0x7ff78653ccf0]
+	(No symbol) [0x0x7ff786564f8b]
+	(No symbol) [0x0x7ff78653c8b3]
+	(No symbol) [0x0x7ff786505272]
+	(No symbol) [0x0x7ff786506043]
+	GetHandleVerifier [0x0x7ff7869fb9cd+2946349]
+	GetHandleVerifier [0x0x7ff7869f5c4a+2922410]
+	GetHandleVerifier [0x0x7ff786a159d7+3052855]
+	GetHandleVerifier [0x0x7ff78675aa7e+189918]
+	GetHandleVerifier [0x0x7ff786762a1f+222591]
+	GetHandleVerifier [0x0x7ff786748ab4+116244]
+	GetHandleVerifier [0x0x7ff786748c69+116681]
+	GetHandleVerifier [0x0x7ff78672f048+11176]
+	BaseThreadInitThunk [0x0x7ffa3d9ee8d7+23]
+	RtlUserThreadStart [0x0x7ffa3e428d9c+44]
+
+[2025-09-11 14:26:02.652] [END] 自動プレイ終了: 0/3ステージクリア, 合計敵衝突: 0回

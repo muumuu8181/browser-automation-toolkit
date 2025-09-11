@@ -1,0 +1,59 @@
+[
+  {
+    "episode": 1,
+    "timestamp": "2025-09-11T10:10:16.141551",
+    "duration": 2.995840311050415,
+    "final_score": 0,
+    "kills": 0,
+    "final_hp": 0,
+    "final_mp": 50,
+    "enemies_remaining": 6,
+    "actions_taken": 10,
+    "action_breakdown": {
+      "attack": 1,
+      "dodge": 7,
+      "chase": 1,
+      "explore": 0,
+      "adjust": 0,
+      "special": 1
+    }
+  },
+  {
+    "episode": 2,
+    "timestamp": "2025-09-11T10:10:28.502575",
+    "duration": 2.35099720954895,
+    "final_score": 0,
+    "kills": 0,
+    "final_hp": 0,
+    "final_mp": 50,
+    "enemies_remaining": 6,
+    "actions_taken": 7,
+    "action_breakdown": {
+      "attack": 0,
+      "dodge": 7,
+      "chase": 0,
+      "explore": 0,
+      "adjust": 0,
+      "special": 0
+    }
+  },
+  {
+    "episode": 3,
+    "timestamp": "2025-09-11T10:10:41.989969",
+    "duration": 3.521097183227539,
+    "final_score": 0,
+    "kills": 0,
+    "final_hp": 0,
+    "final_mp": 50,
+    "enemies_remaining": 6,
+    "actions_taken": 11,
+    "action_breakdown": {
+      "attack": 1,
+      "dodge": 10,
+      "chase": 0,
+      "explore": 0,
+      "adjust": 0,
+      "special": 0
+    }
+  }
+]

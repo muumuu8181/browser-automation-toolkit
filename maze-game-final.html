@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>迷路ゲーム - 完全版（時間制限付き）</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #222;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        
+        .game-container {
+            text-align: center;
+        }
+        
+        canvas {
+            border: 3px solid #fff;
+            background-color: #000;
+        }
+        
+        .info {
+            margin-top: 20px;
+            font-size: 18px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        
+        .time-info {
+            color: #f80;
+            font-weight: bold;
+            font-size: 24px;
+            animation: pulse 1s infinite;
+        }
+        
+        .time-warning {
+            animation: warning 0.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes warning {
+            0% { color: #f80; }
+            50% { color: #f00; }
+            100% { color: #f80; }
+        }
+        
+        .floor-info {
+            color: #0ff;
+            font-weight: bold;
+        }
+        
+        .score-info {
+            color: #0f0;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        .controls {
+            margin-top: 10px;
+            color: #0f0;
+            font-size: 14px;
+        }
+        
+        .game-over {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #fff;
+            padding: 20px;
+            text-align: center;
+            z-index: 1000;
+        }
+        
+        .high-score {
+            color: #ff0;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>迷路ゲーム - 完全版</h1>
+        <canvas id="gameCanvas" width="500" height="500"></canvas>
+        <div class="info">
+            <div>ステージ: <span id="stage">1</span></div>
+            <div class="time-info">残り時間: <span id="timeLeft">60</span>秒</div>
+            <div class="floor-info">地下 <span id="currentFloor">1</span>階 / 全<span id="totalFloors">3</span>階</div>
+            <div>ステップ数: <span id="steps">0</span></div>
+            <div>ライフ: <span id="health">5</span></div>
+            <div>鍵: <span id="keyCount">0</span></div>
+            <div>攻撃: <span id="attackCount">5</span></div>
+            <div class="score-info">スコア: <span id="score">0</span></div>
+        </div>
+        <div class="controls">
+            操作: 矢印キー/WASD: 移動 | スペース: 攻撃 | X: 全体攻撃<br>
+            時間内にゴールを目指せ！タイムボーナスあり！
+        </div>
+    </div>
+    
+    <div id="gameOverScreen" class="game-over">
+        <h2>ゲーム結果</h2>
+        <div id="gameOverMessage"></div>
+        <div class="high-score">最高スコア: <span id="highScore">0</span></div>
+        <button onclick="resetGame()" style="margin-top: 20px; padding: 10px 20px; font-size: 18px;">もう一度プレイ</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // ゲーム設定
+        const CELL_SIZE = 25;
+        const MAZE_WIDTH = 20;
+        const MAZE_HEIGHT = 20;
+        
+        // ゲーム状態
+        const game = {
+            player: { 
+                x: 1, 
+                y: 1,
+                direction: 'right',
+                keys: [],
+                attackPower: 1,
+                attacksRemaining: 5,
+                specialAttackUsed: false
+            },
+            currentFloor: 1,
+            totalFloors: 3,
+            floors: [],
+            stairs: { up: null, down: null },
+            goal: null,
+            enemies: [],
+            items: [],
+            doors: [],
+            keys: [],
+            steps: 0,
+            stage: 1,
+            health: 5,
+            score: 0,
+            highScore: localStorage.getItem('mazeHighScore') || 0,
+            maze: [],
+            gameOver: false,
+            visitedFloors: new Set(),
+            
+            // 時間制限
+            timeLimit: 60,
+            timeLeft: 60,
+            startTime: Date.now(),
+            lastTimeUpdate: Date.now(),
+            timeBonus: 0,
+            
+            // コンボシステム
+            combo: 0,
+            lastKillTime: 0,
+            comboTimeout: 3000 // 3秒
+        };
+        
+        // 時間更新
+        function updateTime() {
+            if (game.gameOver) return;
+            
+            const now = Date.now();
+            const elapsed = Math.floor((now - game.startTime) / 1000);
+            game.timeLeft = Math.max(0, game.timeLimit - elapsed);
+            
+            // 時間切れ
+            if (game.timeLeft === 0) {
+                timeUp();
+            }
+            
+            // 警告表示
+            const timeElement = document.querySelector('.time-info');
+            if (game.timeLeft <= 10) {
+                timeElement.classList.add('time-warning');
+            } else {
+                timeElement.classList.remove('time-warning');
+            }
+            
+            // タイムボーナス計算
+            game.timeBonus = game.timeLeft * 10;
+        }
+        
+        // 時間切れ処理
+        function timeUp() {
+            game.gameOver = true;
+            showGameOver('時間切れ！');
+        }
+        
+        // ゲームオーバー画面
+        function showGameOver(reason) {
+            const gameOverScreen = document.getElementById('gameOverScreen');
+            const messageDiv = document.getElementById('gameOverMessage');
+            
+            // 最終スコア計算
+            const finalScore = game.score + game.timeBonus;
+            
+            // ハイスコア更新
+            if (finalScore > game.highScore) {
+                game.highScore = finalScore;
+                localStorage.setItem('mazeHighScore', game.highScore);
+            }
+            
+            messageDiv.innerHTML = `
+                <h3>${reason}</h3>
+                <p>ステージ: ${game.stage}</p>
+                <p>到達階層: 地下${game.currentFloor}階</p>
+                <p>基本スコア: ${game.score}</p>
+                <p>タイムボーナス: ${game.timeBonus}</p>
+                <p style="font-size: 24px; color: #0f0;">最終スコア: ${finalScore}</p>
+            `;
+            
+            document.getElementById('highScore').textContent = game.highScore;
+            gameOverScreen.style.display = 'block';
+        }
+        
+        // 敵クラス（スコア計算改良）
+        class Enemy {
+            constructor(x, y, type = 'basic') {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.health = this.getHealthByType();
+                this.maxHealth = this.health;
+                this.color = this.getColorByType();
+                this.moveInterval = this.getMoveIntervalByType();
+                this.lastMove = Date.now();
+                this.value = this.getValueByType();
+            }
+            
+            getHealthByType() {
+                const baseHealth = {
+                    basic: 1,
+                    strong: 2,
+                    boss: 3
+                };
+                return baseHealth[this.type] + Math.floor(game.currentFloor / 2);
+            }
+            
+            getColorByType() {
+                switch(this.type) {
+                    case 'basic': return '#f00';
+                    case 'strong': return '#f0f';
+                    case 'boss': return '#fa0';
+                    default: return '#f00';
+                }
+            }
+            
+            getMoveIntervalByType() {
+                // 時間が少なくなると敵も速くなる
+                const speedBoost = game.timeLeft < 20 ? 0.8 : 1;
+                const base = {
+                    basic: 800,
+                    strong: 600,
+                    boss: 1000
+                };
+                return base[this.type] * speedBoost;
+            }
+            
+            getValueByType() {
+                const baseValue = {
+                    basic: 10,
+                    strong: 20,
+                    boss: 50
+                };
+                return baseValue[this.type] * game.currentFloor;
+            }
+            
+            update() {
+                const now = Date.now();
+                if (now - this.lastMove < this.moveInterval) return;
+                
+                this.lastMove = now;
+                
+                const dx = Math.sign(game.player.x - this.x);
+                const dy = Math.sign(game.player.y - this.y);
+                
+                if (Math.random() < 0.5 && dx !== 0) {
+                    if (!this.tryMove(dx, 0)) {
+                        this.tryMove(0, dy);
+                    }
+                } else if (dy !== 0) {
+                    if (!this.tryMove(0, dy)) {
+                        this.tryMove(dx, 0);
+                    }
+                } else {
+                    this.tryMove(dx, 0);
+                }
+            }
+            
+            tryMove(dx, dy) {
+                const newX = this.x + dx;
+                const newY = this.y + dy;
+                
+                if (newX >= 0 && newX < MAZE_WIDTH && 
+                    newY >= 0 && newY < MAZE_HEIGHT && 
+                    game.maze[newY][newX] === 0) {
+                    
+                    const door = game.doors.find(d => d.x === newX && d.y === newY && !d.isOpen);
+                    if (door) return false;
+                    
+                    if ((game.stairs.up && game.stairs.up.x === newX && game.stairs.up.y === newY) ||
+                        (game.stairs.down && game.stairs.down.x === newX && game.stairs.down.y === newY)) {
+                        return false;
+                    }
+                    
+                    const collision = game.enemies.some(e => 
+                        e !== this && e.x === newX && e.y === newY
+                    );
+                    
+                    if (!collision) {
+                        this.x = newX;
+                        this.y = newY;
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            takeDamage(damage) {
+                this.health -= damage;
+                if (this.health <= 0) {
+                    // コンボ計算
+                    const now = Date.now();
+                    if (now - game.lastKillTime < game.comboTimeout) {
+                        game.combo++;
+                    } else {
+                        game.combo = 1;
+                    }
+                    game.lastKillTime = now;
+                    
+                    // スコア計算（コンボボーナス付き）
+                    const comboMultiplier = Math.min(game.combo, 5);
+                    const scoreGain = this.value * comboMultiplier;
+                    game.score += scoreGain;
+                    
+                    console.log(`[KILL] ${this.type}を倒した！ +${scoreGain}点 (x${comboMultiplier}コンボ)`);
+                    return true;
+                }
+                return false;
+            }
+        }
+        
+        // 他のクラス（Door, Key, Item, Stairs）は前バージョンと同じ
+        class Stairs {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+            }
+        }
+        
+        class Door {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.isOpen = false;
+            }
+            
+            tryOpen(playerKeys) {
+                if (this.isOpen) return true;
+                
+                const keyIndex = playerKeys.indexOf(this.color);
+                if (keyIndex !== -1) {
+                    this.isOpen = true;
+                    playerKeys.splice(keyIndex, 1);
+                    console.log(`[DOOR] ${this.color}のドアが開いた！`);
+                    game.score += 25;
+                    return true;
+                }
+                return false;
+            }
+        }
+        
+        class Key {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.collected = false;
+            }
+            
+            collect() {
+                if (!this.collected) {
+                    this.collected = true;
+                    game.player.keys.push(this.color);
+                    console.log(`[KEY] ${this.color}の鍵を入手！`);
+                    game.score += 15;
+                }
+            }
+        }
+        
+        class Item {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.collected = false;
+            }
+            
+            collect() {
+                if (this.collected) return;
+                
+                this.collected = true;
+                switch(this.type) {
+                    case 'heart':
+                        game.health = Math.min(game.health + 2, 10);
+                        game.score += 5;
+                        console.log('[ITEM] ハート獲得！ ライフ+2');
+                        break;
+                    case 'power':
+                        game.player.attackPower += 1;
+                        game.score += 10;
+                        console.log('[ITEM] パワーアップ！ 攻撃力+1');
+                        break;
+                    case 'ammo':
+                        game.player.attacksRemaining += 5;
+                        game.score += 5;
+                        console.log('[ITEM] 弾薬獲得！ 攻撃回数+5');
+                        break;
+                    case 'time':
+                        game.timeLeft += 15;
+                        game.startTime += 15000;
+                        game.score += 20;
+                        console.log('[ITEM] 時間延長！ +15秒');
+                        break;
+                }
+            }
+        }
+        
+        // フロア生成関数は前バージョンとほぼ同じ
+        function generateAllFloors() {
+            game.floors = [];
+            game.totalFloors = 2 + Math.floor(game.stage / 2);
+            
+            // ステージが進むにつれて制限時間を調整
+            game.timeLimit = 60 + (game.stage - 1) * 15 + (game.totalFloors - 2) * 10;
+            game.timeLeft = game.timeLimit;
+            game.startTime = Date.now();
+            
+            for (let floor = 1; floor <= game.totalFloors; floor++) {
+                const floorData = generateFloor(floor);
+                game.floors.push(floorData);
+            }
+            
+            loadFloor(1);
+        }
+        
+        function generateFloor(floorNumber) {
+            const maze = [];
+            for (let y = 0; y < MAZE_HEIGHT; y++) {
+                maze[y] = [];
+                for (let x = 0; x < MAZE_WIDTH; x++) {
+                    maze[y][x] = 1;
+                }
+            }
+            
+            const stack = [{x: 1, y: 1}];
+            maze[1][1] = 0;
+            
+            while (stack.length > 0) {
+                const current = stack[stack.length - 1];
+                const directions = [
+                    {dx: 2, dy: 0}, {dx: -2, dy: 0},
+                    {dx: 0, dy: 2}, {dx: 0, dy: -2}
+                ];
+                
+                for (let i = directions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [directions[i], directions[j]] = [directions[j], directions[i]];
+                }
+                
+                let found = false;
+                for (const dir of directions) {
+                    const nx = current.x + dir.dx;
+                    const ny = current.y + dir.dy;
+                    
+                    if (nx > 0 && nx < MAZE_WIDTH - 1 && 
+                        ny > 0 && ny < MAZE_HEIGHT - 1 && 
+                        maze[ny][nx] === 1) {
+                        
+                        maze[ny][nx] = 0;
+                        maze[current.y + dir.dy/2][current.x + dir.dx/2] = 0;
+                        
+                        stack.push({x: nx, y: ny});
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    stack.pop();
+                }
+            }
+            
+            for (let i = 0; i < 5 + floorNumber; i++) {
+                const x = Math.floor(Math.random() * (MAZE_WIDTH - 2)) + 1;
+                const y = Math.floor(Math.random() * (MAZE_HEIGHT - 2)) + 1;
+                maze[y][x] = 0;
+            }
+            
+            let stairs = { up: null, down: null };
+            
+            if (floorNumber < game.totalFloors) {
+                let placed = false;
+                while (!placed) {
+                    const x = 15 + Math.floor(Math.random() * 4);
+                    const y = 15 + Math.floor(Math.random() * 4);
+                    if (maze[y][x] === 0) {
+                        stairs.down = new Stairs(x, y, 'down');
+                        placed = true;
+                    }
+                }
+            }
+            
+            if (floorNumber > 1) {
+                let placed = false;
+                while (!placed) {
+                    const x = 1 + Math.floor(Math.random() * 4);
+                    const y = 1 + Math.floor(Math.random() * 4);
+                    if (maze[y][x] === 0) {
+                        stairs.up = new Stairs(x, y, 'up');
+                        placed = true;
+                    }
+                }
+            }
+            
+            let goal = null;
+            if (floorNumber === game.totalFloors) {
+                goal = { x: 18, y: 18 };
+                maze[18][18] = 0;
+                maze[17][18] = 0;
+                maze[18][17] = 0;
+            }
+            
+            return {
+                maze: maze,
+                stairs: stairs,
+                goal: goal,
+                enemies: [],
+                items: [],
+                doors: [],
+                keys: []
+            };
+        }
+        
+        function loadFloor(floorNumber) {
+            const floorData = game.floors[floorNumber - 1];
+            
+            game.currentFloor = floorNumber;
+            game.maze = floorData.maze;
+            game.stairs = floorData.stairs;
+            game.goal = floorData.goal;
+            
+            if (!game.visitedFloors.has(floorNumber)) {
+                game.visitedFloors.add(floorNumber);
+                placeEnemies(floorData);
+                placeItems(floorData);
+                placeDoorsAndKeys(floorData);
+            }
+            
+            game.enemies = [...floorData.enemies];
+            game.items = [...floorData.items];
+            game.doors = [...floorData.doors];
+            game.keys = [...floorData.keys];
+            
+            console.log(`[FLOOR] 地下${floorNumber}階に移動`);
+        }
+        
+        function placeEnemies(floorData) {
+            const enemyCount = 2 + game.currentFloor + Math.floor(game.stage / 2);
+            
+            for (let i = 0; i < enemyCount; i++) {
+                let placed = false;
+                let attempts = 0;
+                
+                while (!placed && attempts < 100) {
+                    const x = Math.floor(Math.random() * MAZE_WIDTH);
+                    const y = Math.floor(Math.random() * MAZE_HEIGHT);
+                    
+                    if (floorData.maze[y][x] === 0 && 
+                        !(x === 1 && y === 1) &&
+                        !(floorData.goal && x === floorData.goal.x && y === floorData.goal.y) &&
+                        !(floorData.stairs.up && x === floorData.stairs.up.x && y === floorData.stairs.up.y) &&
+                        !(floorData.stairs.down && x === floorData.stairs.down.x && y === floorData.stairs.down.y)) {
+                        
+                        let type = 'basic';
+                        if (game.currentFloor === game.totalFloors && i === 0) {
+                            type = 'boss';
+                        } else if (i % 3 === 0) {
+                            type = 'strong';
+                        }
+                        
+                        floorData.enemies.push(new Enemy(x, y, type));
+                        placed = true;
+                    }
+                    attempts++;
+                }
+            }
+        }
+        
+        function placeItems(floorData) {
+            const itemCount = 2 + Math.floor(game.currentFloor / 2);
+            
+            for (let i = 0; i < itemCount; i++) {
+                let placed = false;
+                let attempts = 0;
+                
+                while (!placed && attempts < 100) {
+                    const x = Math.floor(Math.random() * MAZE_WIDTH);
+                    const y = Math.floor(Math.random() * MAZE_HEIGHT);
+                    
+                    if (floorData.maze[y][x] === 0) {
+                        const types = ['heart', 'power', 'ammo'];
+                        // 深い階層では時間延長アイテムも出現
+                        if (game.currentFloor > 1 && Math.random() < 0.3) {
+                            types.push('time');
+                        }
+                        const type = types[Math.floor(Math.random() * types.length)];
+                        
+                        floorData.items.push(new Item(x, y, type));
+                        placed = true;
+                    }
+                    attempts++;
+                }
+            }
+        }
+        
+        function placeDoorsAndKeys(floorData) {
+            if (game.currentFloor === 1) return;
+            
+            const colors = ['red', 'blue', 'yellow'];
+            const doorCount = Math.min(Math.floor(game.currentFloor / 2), 2);
+            
+            for (let i = 0; i < doorCount; i++) {
+                const color = colors[i];
+                
+                let doorPlaced = false;
+                let attempts = 0;
+                
+                while (!doorPlaced && attempts < 100) {
+                    const x = 5 + Math.floor(Math.random() * 10);
+                    const y = 5 + Math.floor(Math.random() * 10);
+                    
+                    if (floorData.maze[y][x] === 0) {
+                        floorData.doors.push(new Door(x, y, color));
+                        doorPlaced = true;
+                    }
+                    attempts++;
+                }
+                
+                let keyPlaced = false;
+                attempts = 0;
+                
+                while (!keyPlaced && attempts < 100) {
+                    const x = Math.floor(Math.random() * MAZE_WIDTH);
+                    const y = Math.floor(Math.random() * MAZE_HEIGHT);
+                    
+                    if (floorData.maze[y][x] === 0) {
+                        floorData.keys.push(new Key(x, y, color));
+                        keyPlaced = true;
+                    }
+                    attempts++;
+                }
+            }
+        }
+        
+        function movePlayer(dx, dy) {
+            if (game.gameOver) return;
+            
+            const newX = game.player.x + dx;
+            const newY = game.player.y + dy;
+            
+            if (dx > 0) game.player.direction = 'right';
+            else if (dx < 0) game.player.direction = 'left';
+            else if (dy > 0) game.player.direction = 'down';
+            else if (dy < 0) game.player.direction = 'up';
+            
+            if (newX >= 0 && newX < MAZE_WIDTH && 
+                newY >= 0 && newY < MAZE_HEIGHT && 
+                game.maze[newY][newX] === 0) {
+                
+                const door = game.doors.find(d => d.x === newX && d.y === newY);
+                if (door && !door.isOpen) {
+                    if (!door.tryOpen(game.player.keys)) {
+                        console.log(`[DOOR] ${door.color}の鍵が必要です！`);
+                        return;
+                    }
+                }
+                
+                game.player.x = newX;
+                game.player.y = newY;
+                game.steps++;
+                
+                if (game.stairs.up && game.stairs.up.x === newX && game.stairs.up.y === newY) {
+                    console.log('[STAIRS] 上の階へ！');
+                    changeFloor(game.currentFloor - 1);
+                } else if (game.stairs.down && game.stairs.down.x === newX && game.stairs.down.y === newY) {
+                    console.log('[STAIRS] 下の階へ！');
+                    changeFloor(game.currentFloor + 1);
+                }
+                
+                for (const key of game.keys) {
+                    if (!key.collected && key.x === newX && key.y === newY) {
+                        key.collect();
+                    }
+                }
+                
+                for (const item of game.items) {
+                    if (!item.collected && item.x === newX && item.y === newY) {
+                        item.collect();
+                    }
+                }
+                
+                if (game.goal && game.player.x === game.goal.x && game.player.y === game.goal.y) {
+                    stageClear();
+                }
+            }
+        }
+        
+        function stageClear() {
+            // ステージクリアボーナス
+            const clearBonus = 100 * game.stage;
+            const totalScore = game.score + game.timeBonus + clearBonus;
+            
+            alert(`ステージ${game.stage}クリア！\n` +
+                  `基本スコア: ${game.score}\n` +
+                  `タイムボーナス: ${game.timeBonus}\n` +
+                  `クリアボーナス: ${clearBonus}\n` +
+                  `合計: ${totalScore}点`);
+            
+            game.score = totalScore;
+            nextStage();
+        }
+        
+        function changeFloor(newFloor) {
+            if (newFloor < 1 || newFloor > game.totalFloors) return;
+            
+            const currentFloorData = game.floors[game.currentFloor - 1];
+            currentFloorData.enemies = [...game.enemies];
+            currentFloorData.items = [...game.items];
+            currentFloorData.doors = [...game.doors];
+            currentFloorData.keys = [...game.keys];
+            
+            loadFloor(newFloor);
+            
+            if (newFloor > game.currentFloor && game.stairs.up) {
+                game.player.x = game.stairs.up.x;
+                game.player.y = game.stairs.up.y;
+            } else if (newFloor < game.currentFloor && game.stairs.down) {
+                game.player.x = game.stairs.down.x;
+                game.player.y = game.stairs.down.y;
+            }
+            
+            game.score += 50;
+        }
+        
+        function attack() {
+            if (game.player.attacksRemaining <= 0 || game.gameOver) return;
+            
+            game.player.attacksRemaining--;
+            
+            let targetX = game.player.x;
+            let targetY = game.player.y;
+            
+            switch(game.player.direction) {
+                case 'right': targetX++; break;
+                case 'left': targetX--; break;
+                case 'down': targetY++; break;
+                case 'up': targetY--; break;
+            }
+            
+            for (let i = game.enemies.length - 1; i >= 0; i--) {
+                const enemy = game.enemies[i];
+                if (enemy.x === targetX && enemy.y === targetY) {
+                    if (enemy.takeDamage(game.player.attackPower)) {
+                        game.enemies.splice(i, 1);
+                    }
+                }
+            }
+        }
+        
+        function specialAttack() {
+            if (game.player.specialAttackUsed || game.gameOver) return;
+            
+            game.player.specialAttackUsed = true;
+            
+            for (let i = game.enemies.length - 1; i >= 0; i--) {
+                const enemy = game.enemies[i];
+                const dist = Math.abs(enemy.x - game.player.x) + Math.abs(enemy.y - game.player.y);
+                
+                if (dist <= 3) {
+                    if (enemy.takeDamage(2)) {
+                        game.enemies.splice(i, 1);
+                    }
+                }
+            }
+        }
+        
+        function nextStage() {
+            game.stage++;
+            game.steps = 0;
+            game.player.x = 1;
+            game.player.y = 1;
+            game.player.attacksRemaining = Math.min(game.player.attacksRemaining + 3, 10);
+            game.player.specialAttackUsed = false;
+            game.health = Math.min(game.health + 1, 10);
+            game.visitedFloors.clear();
+            game.combo = 0;
+            generateAllFloors();
+        }
+        
+        function checkCollisions() {
+            for (const enemy of game.enemies) {
+                if (enemy.x === game.player.x && enemy.y === game.player.y) {
+                    game.health--;
+                    
+                    if (game.health <= 0) {
+                        game.gameOver = true;
+                        showGameOver('ゲームオーバー！');
+                    } else {
+                        game.player.x = 1;
+                        game.player.y = 1;
+                    }
+                    break;
+                }
+            }
+        }
+        
+        function resetGame() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            
+            game.stage = 1;
+            game.steps = 0;
+            game.health = 5;
+            game.score = 0;
+            game.currentFloor = 1;
+            game.timeLimit = 60;
+            game.timeLeft = 60;
+            game.startTime = Date.now();
+            game.combo = 0;
+            game.lastKillTime = 0;
+            game.player = {
+                x: 1,
+                y: 1,
+                direction: 'right',
+                keys: [],
+                attackPower: 1,
+                attacksRemaining: 5,
+                specialAttackUsed: false
+            };
+            game.gameOver = false;
+            game.visitedFloors.clear();
+            generateAllFloors();
+        }
+        
+        function gameLoop() {
+            updateTime();
+            
+            for (const enemy of game.enemies) {
+                enemy.update();
+            }
+            
+            checkCollisions();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function render() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for (let y = 0; y < MAZE_HEIGHT; y++) {
+                for (let x = 0; x < MAZE_WIDTH; x++) {
+                    if (game.maze[y][x] === 1) {
+                        const brightness = 102 - (game.currentFloor - 1) * 20;
+                        ctx.fillStyle = `rgb(${brightness}, ${brightness}, ${brightness})`;
+                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    } else {
+                        const brightness = 34 - (game.currentFloor - 1) * 10;
+                        ctx.fillStyle = `rgb(${brightness}, ${brightness}, ${brightness})`;
+                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    }
+                }
+            }
+            
+            if (game.stairs.up) {
+                ctx.fillStyle = '#88f';
+                ctx.fillRect(game.stairs.up.x * CELL_SIZE + 3, 
+                           game.stairs.up.y * CELL_SIZE + 3, 
+                           CELL_SIZE - 6, CELL_SIZE - 6);
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px Arial';
+                ctx.fillText('↑', 
+                           game.stairs.up.x * CELL_SIZE + 7, 
+                           game.stairs.up.y * CELL_SIZE + 18);
+            }
+            
+            if (game.stairs.down) {
+                ctx.fillStyle = '#f88';
+                ctx.fillRect(game.stairs.down.x * CELL_SIZE + 3, 
+                           game.stairs.down.y * CELL_SIZE + 3, 
+                           CELL_SIZE - 6, CELL_SIZE - 6);
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px Arial';
+                ctx.fillText('↓', 
+                           game.stairs.down.x * CELL_SIZE + 7, 
+                           game.stairs.down.y * CELL_SIZE + 18);
+            }
+            
+            for (const door of game.doors) {
+                if (!door.isOpen) {
+                    ctx.fillStyle = door.color;
+                    ctx.fillRect(door.x * CELL_SIZE + 2, door.y * CELL_SIZE + 2, 
+                                CELL_SIZE - 4, CELL_SIZE - 4);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(door.x * CELL_SIZE + 10, door.y * CELL_SIZE + 8, 5, 9);
+                }
+            }
+            
+            for (const key of game.keys) {
+                if (!key.collected) {
+                    ctx.fillStyle = key.color;
+                    ctx.beginPath();
+                    ctx.arc(key.x * CELL_SIZE + CELL_SIZE/2, 
+                           key.y * CELL_SIZE + CELL_SIZE/2 - 3, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillRect(key.x * CELL_SIZE + CELL_SIZE/2 - 1, 
+                                key.y * CELL_SIZE + CELL_SIZE/2 - 3, 2, 8);
+                }
+            }
+            
+            for (const item of game.items) {
+                if (item.collected) continue;
+                
+                switch(item.type) {
+                    case 'heart':
+                        ctx.fillStyle = '#f44';
+                        ctx.fillRect(item.x * CELL_SIZE + 8, item.y * CELL_SIZE + 8, 9, 9);
+                        break;
+                    case 'power':
+                        ctx.fillStyle = '#ff0';
+                        ctx.fillRect(item.x * CELL_SIZE + 7, item.y * CELL_SIZE + 7, 11, 11);
+                        break;
+                    case 'ammo':
+                        ctx.fillStyle = '#4ff';
+                        ctx.fillRect(item.x * CELL_SIZE + 9, item.y * CELL_SIZE + 5, 7, 15);
+                        break;
+                    case 'time':
+                        ctx.fillStyle = '#0f0';
+                        ctx.beginPath();
+                        ctx.arc(item.x * CELL_SIZE + CELL_SIZE/2, 
+                               item.y * CELL_SIZE + CELL_SIZE/2, 8, 0, Math.PI * 2);
+                        ctx.stroke();
+                        ctx.fillText('T', item.x * CELL_SIZE + 9, item.y * CELL_SIZE + 17);
+                        break;
+                }
+            }
+            
+            if (game.goal) {
+                ctx.fillStyle = '#0f0';
+                ctx.fillRect(game.goal.x * CELL_SIZE + 5, game.goal.y * CELL_SIZE + 5, 
+                            CELL_SIZE - 10, CELL_SIZE - 10);
+            }
+            
+            for (const enemy of game.enemies) {
+                ctx.fillStyle = enemy.color;
+                ctx.beginPath();
+                ctx.arc(enemy.x * CELL_SIZE + CELL_SIZE/2, 
+                       enemy.y * CELL_SIZE + CELL_SIZE/2, 
+                       CELL_SIZE/3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if (enemy.health < enemy.maxHealth) {
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(enemy.x * CELL_SIZE + 5, enemy.y * CELL_SIZE - 5, 15, 3);
+                    ctx.fillStyle = '#0f0';
+                    ctx.fillRect(enemy.x * CELL_SIZE + 5, enemy.y * CELL_SIZE - 5, 
+                                15 * (enemy.health / enemy.maxHealth), 3);
+                }
+            }
+            
+            ctx.fillStyle = game.player.attacksRemaining > 0 ? '#ff0' : '#888';
+            ctx.beginPath();
+            ctx.arc(game.player.x * CELL_SIZE + CELL_SIZE/2, 
+                   game.player.y * CELL_SIZE + CELL_SIZE/2, 
+                   CELL_SIZE/3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // コンボ表示
+            if (game.combo > 1) {
+                ctx.fillStyle = '#ff0';
+                ctx.font = 'bold 20px Arial';
+                ctx.fillText(`x${game.combo}`, 
+                    game.player.x * CELL_SIZE - 10, 
+                    game.player.y * CELL_SIZE - 10);
+            }
+            
+            // UI更新
+            document.getElementById('currentFloor').textContent = game.currentFloor;
+            document.getElementById('totalFloors').textContent = game.totalFloors;
+            document.getElementById('steps').textContent = game.steps;
+            document.getElementById('stage').textContent = game.stage;
+            document.getElementById('health').textContent = game.health;
+            document.getElementById('keyCount').textContent = game.player.keys.length;
+            document.getElementById('attackCount').textContent = game.player.attacksRemaining;
+            document.getElementById('score').textContent = game.score;
+            document.getElementById('timeLeft').textContent = Math.max(0, game.timeLeft);
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    movePlayer(0, -1);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    movePlayer(0, 1);
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    movePlayer(-1, 0);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    movePlayer(1, 0);
+                    break;
+                case ' ':
+                    attack();
+                    break;
+                case 'x':
+                case 'X':
+                    specialAttack();
+                    break;
+            }
+        });
+        
+        // ゲーム開始
+        generateAllFloors();
+        console.log('[MAZE] 最終版起動！時間制限付き');
+        gameLoop();
+    </script>
+</body>
+</html>

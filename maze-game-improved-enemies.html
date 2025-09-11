@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>迷路ゲーム - 改良版敵システム</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #222;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        
+        .game-container {
+            text-align: center;
+        }
+        
+        canvas {
+            border: 3px solid #fff;
+            background-color: #000;
+        }
+        
+        .info {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        
+        .controls {
+            margin-top: 10px;
+            color: #0f0;
+        }
+        
+        .health {
+            color: #ff0;
+            font-weight: bold;
+        }
+        
+        .power-status {
+            color: #0ff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>迷路ゲーム - 改良版敵システム</h1>
+        <canvas id="gameCanvas" width="500" height="500"></canvas>
+        <div class="info">
+            <div>ステップ数: <span id="steps">0</span></div>
+            <div>ステージ: <span id="stage">1</span></div>
+            <div class="health">ライフ: <span id="health">3</span></div>
+            <div class="power-status" id="powerStatus" style="display: none;">パワーアップ中！</div>
+        </div>
+        <div class="controls">
+            操作: 矢印キー または WASD<br>
+            スペースキー: 敵を押しのける（クールダウンあり）
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // ゲーム設定
+        const CELL_SIZE = 25;
+        const MAZE_WIDTH = 20;
+        const MAZE_HEIGHT = 20;
+        
+        // ゲーム状態
+        const game = {
+            player: { x: 1, y: 1 },
+            goal: { x: 18, y: 18 },
+            enemies: [],
+            steps: 0,
+            stage: 1,
+            health: 3,
+            maze: [],
+            keys: {},
+            gameOver: false,
+            lastUpdate: 0,
+            pushCooldown: 0,
+            powerUpTime: 0,
+            criticalPaths: [] // クリアに必要な重要な通路
+        };
+        
+        // 敵クラス
+        class Enemy {
+            constructor(x, y, type = 'patrol') {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.color = this.getColorByType();
+                this.moveTimer = 0;
+                this.moveInterval = this.getMoveIntervalByType();
+                this.lastMove = Date.now();
+                this.patrolPath = [];
+                this.patrolIndex = 0;
+                this.stunTime = 0;
+            }
+            
+            getColorByType() {
+                switch(this.type) {
+                    case 'patrol': return '#f00';      // 赤：パトロール型
+                    case 'chaser': return '#f0f';      // 紫：追跡型
+                    case 'guardian': return '#fa0';    // オレンジ：守護型
+                    default: return '#f00';
+                }
+            }
+            
+            getMoveIntervalByType() {
+                switch(this.type) {
+                    case 'patrol': return 600;
+                    case 'chaser': return 400;
+                    case 'guardian': return 800;
+                    default: return 500;
+                }
+            }
+            
+            update() {
+                // スタン中は動かない
+                if (this.stunTime > Date.now()) {
+                    return;
+                }
+                
+                const now = Date.now();
+                if (now - this.lastMove < this.moveInterval) return;
+                
+                this.lastMove = now;
+                
+                // クリティカルパス上にいる場合は移動を優先
+                if (this.isOnCriticalPath()) {
+                    this.moveAwayFromCriticalPath();
+                    return;
+                }
+                
+                switch(this.type) {
+                    case 'patrol':
+                        this.patrolMove();
+                        break;
+                    case 'chaser':
+                        this.chaseMove();
+                        break;
+                    case 'guardian':
+                        this.guardMove();
+                        break;
+                }
+            }
+            
+            isOnCriticalPath() {
+                // 幅1の通路（重要な通路）にいるかチェック
+                const neighbors = [
+                    {x: this.x + 1, y: this.y},
+                    {x: this.x - 1, y: this.y},
+                    {x: this.x, y: this.y + 1},
+                    {x: this.x, y: this.y - 1}
+                ];
+                
+                let wallCount = 0;
+                for (const n of neighbors) {
+                    if (n.x < 0 || n.x >= MAZE_WIDTH || 
+                        n.y < 0 || n.y >= MAZE_HEIGHT ||
+                        game.maze[n.y][n.x] === 1) {
+                        wallCount++;
+                    }
+                }
+                
+                // 2方向以上が壁なら狭い通路
+                return wallCount >= 2;
+            }
+            
+            moveAwayFromCriticalPath() {
+                // 広い場所へ移動を試みる
+                const directions = [
+                    {dx: 1, dy: 0}, {dx: -1, dy: 0},
+                    {dx: 0, dy: 1}, {dx: 0, dy: -1}
+                ];
+                
+                // 各方向の広さを評価
+                let bestDir = null;
+                let bestSpace = -1;
+                
+                for (const dir of directions) {
+                    const nx = this.x + dir.dx;
+                    const ny = this.y + dir.dy;
+                    
+                    if (this.canMoveTo(nx, ny)) {
+                        const space = this.evaluateSpace(nx, ny);
+                        if (space > bestSpace) {
+                            bestSpace = space;
+                            bestDir = dir;
+                        }
+                    }
+                }
+                
+                if (bestDir) {
+                    this.tryMove(bestDir.dx, bestDir.dy);
+                }
+            }
+            
+            evaluateSpace(x, y) {
+                // 周囲の空間の広さを評価
+                let space = 0;
+                for (let dx = -1; dx <= 1; dx++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        const nx = x + dx;
+                        const ny = y + dy;
+                        if (nx >= 0 && nx < MAZE_WIDTH && 
+                            ny >= 0 && ny < MAZE_HEIGHT && 
+                            game.maze[ny][nx] === 0) {
+                            space++;
+                        }
+                    }
+                }
+                return space;
+            }
+            
+            patrolMove() {
+                // パトロール型：決まった経路を巡回
+                const directions = [
+                    {dx: 1, dy: 0}, {dx: -1, dy: 0},
+                    {dx: 0, dy: 1}, {dx: 0, dy: -1}
+                ];
+                
+                const validDirs = directions.filter(dir => 
+                    this.canMoveTo(this.x + dir.dx, this.y + dir.dy)
+                );
+                
+                if (validDirs.length > 0) {
+                    const dir = validDirs[Math.floor(Math.random() * validDirs.length)];
+                    this.tryMove(dir.dx, dir.dy);
+                }
+            }
+            
+            chaseMove() {
+                // 追跡型：プレイヤーを追いかける（ただし賢く）
+                const dx = Math.sign(game.player.x - this.x);
+                const dy = Math.sign(game.player.y - this.y);
+                const dist = Math.abs(game.player.x - this.x) + Math.abs(game.player.y - this.y);
+                
+                // 近すぎる場合は少し離れる
+                if (dist < 3 && game.powerUpTime <= Date.now()) {
+                    if (this.tryMove(-dx, -dy)) return;
+                }
+                
+                // 通常の追跡
+                if (Math.random() < 0.7 && dx !== 0) {
+                    if (!this.tryMove(dx, 0)) {
+                        this.tryMove(0, dy);
+                    }
+                } else if (dy !== 0) {
+                    if (!this.tryMove(0, dy)) {
+                        this.tryMove(dx, 0);
+                    }
+                }
+            }
+            
+            guardMove() {
+                // 守護型：ゴール付近を守る
+                const goalDist = Math.abs(this.x - game.goal.x) + Math.abs(this.y - game.goal.y);
+                
+                if (goalDist > 5) {
+                    // ゴールに近づく
+                    const dx = Math.sign(game.goal.x - this.x);
+                    const dy = Math.sign(game.goal.y - this.y);
+                    this.tryMove(dx, dy);
+                } else {
+                    // ゴール周辺をパトロール
+                    this.patrolMove();
+                }
+            }
+            
+            canMoveTo(x, y) {
+                if (x < 0 || x >= MAZE_WIDTH || y < 0 || y >= MAZE_HEIGHT) {
+                    return false;
+                }
+                
+                if (game.maze[y][x] === 1) {
+                    return false;
+                }
+                
+                // 他の敵との衝突チェック
+                const collision = game.enemies.some(e => 
+                    e !== this && e.x === x && e.y === y
+                );
+                
+                // プレイヤーとの衝突は許可（ダメージ判定は別で行う）
+                
+                return !collision;
+            }
+            
+            tryMove(dx, dy) {
+                const newX = this.x + dx;
+                const newY = this.y + dy;
+                
+                if (this.canMoveTo(newX, newY)) {
+                    this.x = newX;
+                    this.y = newY;
+                    return true;
+                }
+                return false;
+            }
+            
+            push(dx, dy) {
+                // 敵を押しのける
+                this.stunTime = Date.now() + 1000; // 1秒スタン
+                const pushX = this.x + dx * 2;
+                const pushY = this.y + dy * 2;
+                
+                if (this.canMoveTo(pushX, pushY)) {
+                    this.x = pushX;
+                    this.y = pushY;
+                } else if (this.canMoveTo(this.x + dx, this.y + dy)) {
+                    this.x += dx;
+                    this.y += dy;
+                }
+            }
+        }
+        
+        // 迷路を生成
+        function generateMaze() {
+            // 初期化（全部壁）
+            game.maze = [];
+            for (let y = 0; y < MAZE_HEIGHT; y++) {
+                game.maze[y] = [];
+                for (let x = 0; x < MAZE_WIDTH; x++) {
+                    game.maze[y][x] = 1; // 1 = 壁
+                }
+            }
+            
+            // 簡単な迷路を作る（通路を掘る）
+            const stack = [{x: 1, y: 1}];
+            game.maze[1][1] = 0;
+            
+            while (stack.length > 0) {
+                const current = stack[stack.length - 1];
+                const directions = [
+                    {dx: 2, dy: 0}, {dx: -2, dy: 0},
+                    {dx: 0, dy: 2}, {dx: 0, dy: -2}
+                ];
+                
+                // ランダムに並び替え
+                for (let i = directions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [directions[i], directions[j]] = [directions[j], directions[i]];
+                }
+                
+                let found = false;
+                for (const dir of directions) {
+                    const nx = current.x + dir.dx;
+                    const ny = current.y + dir.dy;
+                    
+                    if (nx > 0 && nx < MAZE_WIDTH - 1 && 
+                        ny > 0 && ny < MAZE_HEIGHT - 1 && 
+                        game.maze[ny][nx] === 1) {
+                        
+                        // 通路を掘る
+                        game.maze[ny][nx] = 0;
+                        game.maze[current.y + dir.dy/2][current.x + dir.dx/2] = 0;
+                        
+                        stack.push({x: nx, y: ny});
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    stack.pop();
+                }
+            }
+            
+            // ゴールまでの道を確保
+            game.maze[18][18] = 0;
+            game.maze[17][18] = 0;
+            game.maze[18][17] = 0;
+            
+            // 追加の通路を作成（複数ルート確保）
+            for (let i = 0; i < 5 + game.stage; i++) {
+                const x = Math.floor(Math.random() * (MAZE_WIDTH - 2)) + 1;
+                const y = Math.floor(Math.random() * (MAZE_HEIGHT - 2)) + 1;
+                game.maze[y][x] = 0;
+            }
+            
+            // 敵を配置
+            placeEnemies();
+        }
+        
+        // 敵を配置
+        function placeEnemies() {
+            game.enemies = [];
+            const baseCount = 2;
+            const stageBonus = Math.floor((game.stage - 1) / 2);
+            const enemyCount = Math.min(baseCount + stageBonus, 6); // 最大6体
+            
+            // 広い場所を優先して配置
+            const openSpaces = [];
+            for (let y = 2; y < MAZE_HEIGHT - 2; y++) {
+                for (let x = 2; x < MAZE_WIDTH - 2; x++) {
+                    if (game.maze[y][x] === 0) {
+                        const space = evaluateSpaceAt(x, y);
+                        if (space >= 5) { // 周囲に5マス以上の空間がある
+                            openSpaces.push({x, y, space});
+                        }
+                    }
+                }
+            }
+            
+            // 空間の広さでソート
+            openSpaces.sort((a, b) => b.space - a.space);
+            
+            for (let i = 0; i < enemyCount && i < openSpaces.length; i++) {
+                const pos = openSpaces[i];
+                
+                // プレイヤーとゴールから離れているか確認
+                const playerDist = Math.abs(pos.x - game.player.x) + Math.abs(pos.y - game.player.y);
+                const goalDist = Math.abs(pos.x - game.goal.x) + Math.abs(pos.y - game.goal.y);
+                
+                if (playerDist > 4 && goalDist > 3) {
+                    let type;
+                    if (i === 0 && game.stage >= 3) {
+                        type = 'guardian';
+                    } else if (i % 2 === 1 && game.stage >= 2) {
+                        type = 'chaser';
+                    } else {
+                        type = 'patrol';
+                    }
+                    
+                    game.enemies.push(new Enemy(pos.x, pos.y, type));
+                }
+            }
+        }
+        
+        function evaluateSpaceAt(x, y) {
+            let space = 0;
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    if (nx >= 0 && nx < MAZE_WIDTH && 
+                        ny >= 0 && ny < MAZE_HEIGHT && 
+                        game.maze[ny][nx] === 0) {
+                        space++;
+                    }
+                }
+            }
+            return space;
+        }
+        
+        // プレイヤーの移動
+        function movePlayer(dx, dy) {
+            if (game.gameOver) return;
+            
+            const newX = game.player.x + dx;
+            const newY = game.player.y + dy;
+            
+            // 壁チェック
+            if (newX >= 0 && newX < MAZE_WIDTH && 
+                newY >= 0 && newY < MAZE_HEIGHT && 
+                game.maze[newY][newX] === 0) {
+                
+                game.player.x = newX;
+                game.player.y = newY;
+                game.steps++;
+                
+                // ゴール判定
+                if (game.player.x === game.goal.x && game.player.y === game.goal.y) {
+                    alert(`クリア！ ステップ数: ${game.steps}`);
+                    nextStage();
+                }
+            }
+        }
+        
+        // 敵を押しのける
+        function pushEnemies() {
+            if (game.pushCooldown > Date.now()) {
+                console.log('[PUSH] クールダウン中');
+                return;
+            }
+            
+            game.pushCooldown = Date.now() + 3000; // 3秒のクールダウン
+            console.log('[PUSH] 敵を押しのける！');
+            
+            // 周囲の敵を押しのける
+            for (const enemy of game.enemies) {
+                const dx = enemy.x - game.player.x;
+                const dy = enemy.y - game.player.y;
+                const dist = Math.abs(dx) + Math.abs(dy);
+                
+                if (dist <= 2) {
+                    const pushDx = Math.sign(dx);
+                    const pushDy = Math.sign(dy);
+                    enemy.push(pushDx, pushDy);
+                }
+            }
+            
+            // エフェクト表示
+            game.powerUpTime = Date.now() + 500;
+        }
+        
+        // 次のステージ
+        function nextStage() {
+            game.stage++;
+            game.steps = 0;
+            game.player = { x: 1, y: 1 };
+            game.health = Math.min(game.health + 1, 5); // ライフを1回復（最大5）
+            game.pushCooldown = 0; // クールダウンリセット
+            generateMaze();
+        }
+        
+        // 衝突チェック
+        function checkCollisions() {
+            if (game.powerUpTime > Date.now()) return; // パワーアップ中は無敵
+            
+            for (const enemy of game.enemies) {
+                if (enemy.stunTime > Date.now()) continue; // スタン中の敵は無害
+                
+                if (enemy.x === game.player.x && enemy.y === game.player.y) {
+                    game.health--;
+                    console.log('[COLLISION] プレイヤーが敵と衝突！ 残りライフ:', game.health);
+                    
+                    if (game.health <= 0) {
+                        game.gameOver = true;
+                        alert(`ゲームオーバー！ ステージ${game.stage}で力尽きました...`);
+                        resetGame();
+                    } else {
+                        // プレイヤーを初期位置に戻す
+                        game.player = { x: 1, y: 1 };
+                        game.powerUpTime = Date.now() + 2000; // 2秒間無敵
+                    }
+                    break;
+                }
+            }
+        }
+        
+        // ゲームリセット
+        function resetGame() {
+            game.stage = 1;
+            game.steps = 0;
+            game.health = 3;
+            game.player = { x: 1, y: 1 };
+            game.gameOver = false;
+            game.pushCooldown = 0;
+            game.powerUpTime = 0;
+            generateMaze();
+        }
+        
+        // ゲームループ
+        function gameLoop() {
+            // 敵の更新
+            for (const enemy of game.enemies) {
+                enemy.update();
+            }
+            
+            // 衝突チェック
+            checkCollisions();
+            
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 描画
+        function render() {
+            // 背景をクリア
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 迷路を描画
+            for (let y = 0; y < MAZE_HEIGHT; y++) {
+                for (let x = 0; x < MAZE_WIDTH; x++) {
+                    if (game.maze[y][x] === 1) {
+                        // 壁
+                        ctx.fillStyle = '#666';
+                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    } else {
+                        // 通路
+                        ctx.fillStyle = '#222';
+                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    }
+                }
+            }
+            
+            // ゴールを描画
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(game.goal.x * CELL_SIZE + 5, game.goal.y * CELL_SIZE + 5, 
+                        CELL_SIZE - 10, CELL_SIZE - 10);
+            
+            // 敵を描画
+            for (const enemy of game.enemies) {
+                ctx.fillStyle = enemy.stunTime > Date.now() ? '#888' : enemy.color;
+                ctx.beginPath();
+                ctx.arc(enemy.x * CELL_SIZE + CELL_SIZE/2, 
+                       enemy.y * CELL_SIZE + CELL_SIZE/2, 
+                       CELL_SIZE/3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 敵の顔を描画
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(enemy.x * CELL_SIZE + 8, enemy.y * CELL_SIZE + 8, 3, 3);
+                ctx.fillRect(enemy.x * CELL_SIZE + 14, enemy.y * CELL_SIZE + 8, 3, 3);
+                
+                // スタン中は×印
+                if (enemy.stunTime > Date.now()) {
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(enemy.x * CELL_SIZE + 5, enemy.y * CELL_SIZE + 5);
+                    ctx.lineTo(enemy.x * CELL_SIZE + 20, enemy.y * CELL_SIZE + 20);
+                    ctx.moveTo(enemy.x * CELL_SIZE + 20, enemy.y * CELL_SIZE + 5);
+                    ctx.lineTo(enemy.x * CELL_SIZE + 5, enemy.y * CELL_SIZE + 20);
+                    ctx.stroke();
+                }
+            }
+            
+            // プレイヤーを描画
+            if (game.powerUpTime > Date.now()) {
+                // 無敵時は点滅
+                ctx.fillStyle = Math.floor(Date.now() / 100) % 2 ? '#ff0' : '#fff';
+            } else {
+                ctx.fillStyle = '#ff0';
+            }
+            
+            ctx.beginPath();
+            ctx.arc(game.player.x * CELL_SIZE + CELL_SIZE/2, 
+                   game.player.y * CELL_SIZE + CELL_SIZE/2, 
+                   CELL_SIZE/3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // プッシュクールダウン表示
+            if (game.pushCooldown > Date.now()) {
+                const remaining = Math.ceil((game.pushCooldown - Date.now()) / 1000);
+                ctx.fillStyle = '#0ff';
+                ctx.font = '12px Arial';
+                ctx.fillText(`押:${remaining}s`, 
+                    game.player.x * CELL_SIZE - 5, 
+                    game.player.y * CELL_SIZE - 5);
+            }
+            
+            // 情報を更新
+            document.getElementById('steps').textContent = game.steps;
+            document.getElementById('stage').textContent = game.stage;
+            document.getElementById('health').textContent = game.health;
+            
+            // パワーステータス表示
+            const powerStatus = document.getElementById('powerStatus');
+            if (game.powerUpTime > Date.now()) {
+                powerStatus.style.display = 'block';
+            } else {
+                powerStatus.style.display = 'none';
+            }
+        }
+        
+        // キー入力処理
+        document.addEventListener('keydown', (e) => {
+            game.keys[e.key] = true;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    movePlayer(0, -1);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    movePlayer(0, 1);
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    movePlayer(-1, 0);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    movePlayer(1, 0);
+                    break;
+                case ' ': // スペースキー
+                    pushEnemies();
+                    break;
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            game.keys[e.key] = false;
+        });
+        
+        // ゲーム開始
+        generateMaze();
+        console.log('[MAZE] ゲーム開始！改良版敵システム');
+        console.log('[MAZE] プレイヤー位置:', game.player);
+        console.log('[MAZE] ゴール位置:', game.goal);
+        console.log('[MAZE] 敵の数:', game.enemies.length);
+        console.log('[MAZE] スペースキーで敵を押しのけられます！');
+        
+        // ゲームループ開始
+        gameLoop();
+    </script>
+</body>
+</html>

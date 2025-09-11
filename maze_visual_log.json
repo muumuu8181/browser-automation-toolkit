@@ -1,0 +1,530 @@
+[
+  {
+    "timestamp": "2025-09-11 14:21:28.277",
+    "event_type": "SYSTEM",
+    "message": "ブラウザ起動開始",
+    "unix_time": 1757568088.2802453
+  },
+  {
+    "timestamp": "2025-09-11 14:21:33.019",
+    "event_type": "SYSTEM",
+    "message": "ブラウザ起動完了",
+    "unix_time": 1757568093.0208101
+  },
+  {
+    "timestamp": "2025-09-11 14:21:33.020",
+    "event_type": "GAME",
+    "message": "ゲームファイルを開く: C:\\Users\\user\\Desktop\\work\\90_cc\\20250908\\browser-automation-toolkit\\simple-maze-game.html",
+    "unix_time": 1757568093.0228405
+  },
+  {
+    "timestamp": "2025-09-11 14:21:34.622",
+    "event_type": "GAME",
+    "message": "ゲーム読み込み完了",
+    "unix_time": 1757568094.6226792
+  },
+  {
+    "timestamp": "2025-09-11 14:21:34.622",
+    "event_type": "START",
+    "message": "視覚表示付き自動プレイ開始: 3ステージ",
+    "unix_time": 1757568094.624081
+  },
+  {
+    "timestamp": "2025-09-11 14:21:34.654",
+    "event_type": "VISUAL",
+    "message": "視覚化関数を注入",
+    "unix_time": 1757568094.6567562
+  },
+  {
+    "timestamp": "2025-09-11 14:21:34.672",
+    "event_type": "STAGE",
+    "message": "ステージ 1 開始",
+    "unix_time": 1757568094.6730976
+  },
+  {
+    "timestamp": "2025-09-11 14:21:34.673",
+    "event_type": "INFO",
+    "message": "プレイヤー位置: (1, 1), ゴール位置: (18, 18)",
+    "unix_time": 1757568094.6740992
+  },
+  {
+    "timestamp": "2025-09-11 14:21:34.675",
+    "event_type": "SOLVER",
+    "message": "経路発見: 90ステップ, 探索時間: 0.001秒",
+    "unix_time": 1757568094.6761038
+  },
+  {
+    "timestamp": "2025-09-11 14:21:34.689",
+    "event_type": "VISUAL",
+    "message": "パスを視覚化: 90ステップ",
+    "unix_time": 1757568094.6897042
+  },
+  {
+    "timestamp": "2025-09-11 14:21:36.122",
+    "event_type": "PROGRESS",
+    "message": "進捗: 1.1% (1/90ステップ)",
+    "unix_time": 1757568096.1233842
+  },
+  {
+    "timestamp": "2025-09-11 14:21:37.785",
+    "event_type": "PROGRESS",
+    "message": "進捗: 6.7% (6/90ステップ)",
+    "unix_time": 1757568097.78702
+  },
+  {
+    "timestamp": "2025-09-11 14:21:39.070",
+    "event_type": "PROGRESS",
+    "message": "進捗: 12.2% (11/90ステップ)",
+    "unix_time": 1757568099.0720856
+  },
+  {
+    "timestamp": "2025-09-11 14:21:40.230",
+    "event_type": "PROGRESS",
+    "message": "進捗: 17.8% (16/90ステップ)",
+    "unix_time": 1757568100.2323825
+  },
+  {
+    "timestamp": "2025-09-11 14:21:41.388",
+    "event_type": "PROGRESS",
+    "message": "進捗: 23.3% (21/90ステップ)",
+    "unix_time": 1757568101.389316
+  },
+  {
+    "timestamp": "2025-09-11 14:21:42.645",
+    "event_type": "PROGRESS",
+    "message": "進捗: 28.9% (26/90ステップ)",
+    "unix_time": 1757568102.6466954
+  },
+  {
+    "timestamp": "2025-09-11 14:21:44.774",
+    "event_type": "PROGRESS",
+    "message": "進捗: 34.4% (31/90ステップ)",
+    "unix_time": 1757568104.7744489
+  },
+  {
+    "timestamp": "2025-09-11 14:21:46.086",
+    "event_type": "PROGRESS",
+    "message": "進捗: 40.0% (36/90ステップ)",
+    "unix_time": 1757568106.086911
+  },
+  {
+    "timestamp": "2025-09-11 14:21:47.235",
+    "event_type": "PROGRESS",
+    "message": "進捗: 45.6% (41/90ステップ)",
+    "unix_time": 1757568107.2362266
+  },
+  {
+    "timestamp": "2025-09-11 14:21:48.435",
+    "event_type": "PROGRESS",
+    "message": "進捗: 51.1% (46/90ステップ)",
+    "unix_time": 1757568108.4369645
+  },
+  {
+    "timestamp": "2025-09-11 14:21:49.545",
+    "event_type": "PROGRESS",
+    "message": "進捗: 56.7% (51/90ステップ)",
+    "unix_time": 1757568109.5470784
+  },
+  {
+    "timestamp": "2025-09-11 14:21:50.880",
+    "event_type": "PROGRESS",
+    "message": "進捗: 62.2% (56/90ステップ)",
+    "unix_time": 1757568110.8815856
+  },
+  {
+    "timestamp": "2025-09-11 14:21:52.321",
+    "event_type": "PROGRESS",
+    "message": "進捗: 67.8% (61/90ステップ)",
+    "unix_time": 1757568112.322483
+  },
+  {
+    "timestamp": "2025-09-11 14:21:53.622",
+    "event_type": "PROGRESS",
+    "message": "進捗: 73.3% (66/90ステップ)",
+    "unix_time": 1757568113.623766
+  },
+  {
+    "timestamp": "2025-09-11 14:21:54.807",
+    "event_type": "PROGRESS",
+    "message": "進捗: 78.9% (71/90ステップ)",
+    "unix_time": 1757568114.8092327
+  },
+  {
+    "timestamp": "2025-09-11 14:21:56.035",
+    "event_type": "PROGRESS",
+    "message": "進捗: 84.4% (76/90ステップ)",
+    "unix_time": 1757568116.0353162
+  },
+  {
+    "timestamp": "2025-09-11 14:21:57.163",
+    "event_type": "PROGRESS",
+    "message": "進捗: 90.0% (81/90ステップ)",
+    "unix_time": 1757568117.1646588
+  },
+  {
+    "timestamp": "2025-09-11 14:21:58.234",
+    "event_type": "PROGRESS",
+    "message": "進捗: 95.6% (86/90ステップ)",
+    "unix_time": 1757568118.2366517
+  },
+  {
+    "timestamp": "2025-09-11 14:21:59.140",
+    "event_type": "MOVE",
+    "message": "経路実行完了: 90ステップ, 実行時間: 23.40秒",
+    "unix_time": 1757568119.1423283
+  },
+  {
+    "timestamp": "2025-09-11 14:22:00.153",
+    "event_type": "ALERT",
+    "message": "アラート検知: 'クリア！ ステップ数: 90'",
+    "unix_time": 1757568120.15573
+  },
+  {
+    "timestamp": "2025-09-11 14:22:00.171",
+    "event_type": "ALERT",
+    "message": "アラートを閉じました",
+    "unix_time": 1757568120.1742818
+  },
+  {
+    "timestamp": "2025-09-11 14:22:00.174",
+    "event_type": "CLEAR",
+    "message": "ステージ 1 クリア！",
+    "unix_time": 1757568120.175226
+  },
+  {
+    "timestamp": "2025-09-11 14:22:01.241",
+    "event_type": "STAGE",
+    "message": "ステージ 2 開始",
+    "unix_time": 1757568121.243671
+  },
+  {
+    "timestamp": "2025-09-11 14:22:01.244",
+    "event_type": "INFO",
+    "message": "プレイヤー位置: (1, 1), ゴール位置: (18, 18)",
+    "unix_time": 1757568121.2452104
+  },
+  {
+    "timestamp": "2025-09-11 14:22:01.245",
+    "event_type": "SOLVER",
+    "message": "経路発見: 94ステップ, 探索時間: 0.001秒",
+    "unix_time": 1757568121.247819
+  },
+  {
+    "timestamp": "2025-09-11 14:22:01.267",
+    "event_type": "VISUAL",
+    "message": "パスを視覚化: 94ステップ",
+    "unix_time": 1757568121.268622
+  },
+  {
+    "timestamp": "2025-09-11 14:22:02.506",
+    "event_type": "PROGRESS",
+    "message": "進捗: 1.1% (1/94ステップ)",
+    "unix_time": 1757568122.5067022
+  },
+  {
+    "timestamp": "2025-09-11 14:22:03.982",
+    "event_type": "PROGRESS",
+    "message": "進捗: 6.4% (6/94ステップ)",
+    "unix_time": 1757568123.9851246
+  },
+  {
+    "timestamp": "2025-09-11 14:22:05.232",
+    "event_type": "PROGRESS",
+    "message": "進捗: 11.7% (11/94ステップ)",
+    "unix_time": 1757568125.2336078
+  },
+  {
+    "timestamp": "2025-09-11 14:22:06.483",
+    "event_type": "PROGRESS",
+    "message": "進捗: 17.0% (16/94ステップ)",
+    "unix_time": 1757568126.4841292
+  },
+  {
+    "timestamp": "2025-09-11 14:22:07.668",
+    "event_type": "PROGRESS",
+    "message": "進捗: 22.3% (21/94ステップ)",
+    "unix_time": 1757568127.6694703
+  },
+  {
+    "timestamp": "2025-09-11 14:22:08.772",
+    "event_type": "PROGRESS",
+    "message": "進捗: 27.7% (26/94ステップ)",
+    "unix_time": 1757568128.7740839
+  },
+  {
+    "timestamp": "2025-09-11 14:22:09.891",
+    "event_type": "PROGRESS",
+    "message": "進捗: 33.0% (31/94ステップ)",
+    "unix_time": 1757568129.8924704
+  },
+  {
+    "timestamp": "2025-09-11 14:22:11.018",
+    "event_type": "PROGRESS",
+    "message": "進捗: 38.3% (36/94ステップ)",
+    "unix_time": 1757568131.020184
+  },
+  {
+    "timestamp": "2025-09-11 14:22:12.155",
+    "event_type": "PROGRESS",
+    "message": "進捗: 43.6% (41/94ステップ)",
+    "unix_time": 1757568132.1573422
+  },
+  {
+    "timestamp": "2025-09-11 14:22:13.300",
+    "event_type": "PROGRESS",
+    "message": "進捗: 48.9% (46/94ステップ)",
+    "unix_time": 1757568133.3042963
+  },
+  {
+    "timestamp": "2025-09-11 14:22:14.485",
+    "event_type": "PROGRESS",
+    "message": "進捗: 54.3% (51/94ステップ)",
+    "unix_time": 1757568134.4886265
+  },
+  {
+    "timestamp": "2025-09-11 14:22:15.695",
+    "event_type": "PROGRESS",
+    "message": "進捗: 59.6% (56/94ステップ)",
+    "unix_time": 1757568135.6967072
+  },
+  {
+    "timestamp": "2025-09-11 14:22:16.965",
+    "event_type": "PROGRESS",
+    "message": "進捗: 64.9% (61/94ステップ)",
+    "unix_time": 1757568136.9674842
+  },
+  {
+    "timestamp": "2025-09-11 14:22:18.074",
+    "event_type": "PROGRESS",
+    "message": "進捗: 70.2% (66/94ステップ)",
+    "unix_time": 1757568138.0757253
+  },
+  {
+    "timestamp": "2025-09-11 14:22:19.187",
+    "event_type": "PROGRESS",
+    "message": "進捗: 75.5% (71/94ステップ)",
+    "unix_time": 1757568139.188833
+  },
+  {
+    "timestamp": "2025-09-11 14:22:20.285",
+    "event_type": "PROGRESS",
+    "message": "進捗: 80.9% (76/94ステップ)",
+    "unix_time": 1757568140.2881334
+  },
+  {
+    "timestamp": "2025-09-11 14:22:21.432",
+    "event_type": "PROGRESS",
+    "message": "進捗: 86.2% (81/94ステップ)",
+    "unix_time": 1757568141.4329052
+  },
+  {
+    "timestamp": "2025-09-11 14:22:22.585",
+    "event_type": "PROGRESS",
+    "message": "進捗: 91.5% (86/94ステップ)",
+    "unix_time": 1757568142.5893397
+  },
+  {
+    "timestamp": "2025-09-11 14:22:23.851",
+    "event_type": "PROGRESS",
+    "message": "進捗: 96.8% (91/94ステップ)",
+    "unix_time": 1757568143.8515568
+  },
+  {
+    "timestamp": "2025-09-11 14:22:24.516",
+    "event_type": "MOVE",
+    "message": "経路実行完了: 94ステップ, 実行時間: 22.22秒",
+    "unix_time": 1757568144.5180705
+  },
+  {
+    "timestamp": "2025-09-11 14:22:25.528",
+    "event_type": "ALERT",
+    "message": "アラート検知: 'クリア！ ステップ数: 94'",
+    "unix_time": 1757568145.5313976
+  },
+  {
+    "timestamp": "2025-09-11 14:22:25.548",
+    "event_type": "ALERT",
+    "message": "アラートを閉じました",
+    "unix_time": 1757568145.5502107
+  },
+  {
+    "timestamp": "2025-09-11 14:22:25.550",
+    "event_type": "CLEAR",
+    "message": "ステージ 2 クリア！",
+    "unix_time": 1757568145.5517423
+  },
+  {
+    "timestamp": "2025-09-11 14:22:26.621",
+    "event_type": "STAGE",
+    "message": "ステージ 3 開始",
+    "unix_time": 1757568146.6237705
+  },
+  {
+    "timestamp": "2025-09-11 14:22:26.623",
+    "event_type": "INFO",
+    "message": "プレイヤー位置: (1, 1), ゴール位置: (18, 18)",
+    "unix_time": 1757568146.6247766
+  },
+  {
+    "timestamp": "2025-09-11 14:22:26.625",
+    "event_type": "SOLVER",
+    "message": "経路発見: 94ステップ, 探索時間: 0.001秒",
+    "unix_time": 1757568146.6273332
+  },
+  {
+    "timestamp": "2025-09-11 14:22:26.670",
+    "event_type": "VISUAL",
+    "message": "パスを視覚化: 94ステップ",
+    "unix_time": 1757568146.6706383
+  },
+  {
+    "timestamp": "2025-09-11 14:22:27.932",
+    "event_type": "PROGRESS",
+    "message": "進捗: 1.1% (1/94ステップ)",
+    "unix_time": 1757568147.933588
+  },
+  {
+    "timestamp": "2025-09-11 14:22:29.206",
+    "event_type": "PROGRESS",
+    "message": "進捗: 6.4% (6/94ステップ)",
+    "unix_time": 1757568149.2074633
+  },
+  {
+    "timestamp": "2025-09-11 14:22:30.303",
+    "event_type": "PROGRESS",
+    "message": "進捗: 11.7% (11/94ステップ)",
+    "unix_time": 1757568150.3048117
+  },
+  {
+    "timestamp": "2025-09-11 14:22:31.564",
+    "event_type": "PROGRESS",
+    "message": "進捗: 17.0% (16/94ステップ)",
+    "unix_time": 1757568151.5673895
+  },
+  {
+    "timestamp": "2025-09-11 14:22:32.789",
+    "event_type": "PROGRESS",
+    "message": "進捗: 22.3% (21/94ステップ)",
+    "unix_time": 1757568152.7898533
+  },
+  {
+    "timestamp": "2025-09-11 14:22:34.066",
+    "event_type": "PROGRESS",
+    "message": "進捗: 27.7% (26/94ステップ)",
+    "unix_time": 1757568154.0685384
+  },
+  {
+    "timestamp": "2025-09-11 14:22:35.200",
+    "event_type": "PROGRESS",
+    "message": "進捗: 33.0% (31/94ステップ)",
+    "unix_time": 1757568155.2027092
+  },
+  {
+    "timestamp": "2025-09-11 14:22:36.347",
+    "event_type": "PROGRESS",
+    "message": "進捗: 38.3% (36/94ステップ)",
+    "unix_time": 1757568156.3482041
+  },
+  {
+    "timestamp": "2025-09-11 14:22:37.635",
+    "event_type": "PROGRESS",
+    "message": "進捗: 43.6% (41/94ステップ)",
+    "unix_time": 1757568157.6366792
+  },
+  {
+    "timestamp": "2025-09-11 14:22:38.925",
+    "event_type": "PROGRESS",
+    "message": "進捗: 48.9% (46/94ステップ)",
+    "unix_time": 1757568158.92768
+  },
+  {
+    "timestamp": "2025-09-11 14:22:40.260",
+    "event_type": "PROGRESS",
+    "message": "進捗: 54.3% (51/94ステップ)",
+    "unix_time": 1757568160.2634888
+  },
+  {
+    "timestamp": "2025-09-11 14:22:41.366",
+    "event_type": "PROGRESS",
+    "message": "進捗: 59.6% (56/94ステップ)",
+    "unix_time": 1757568161.3665266
+  },
+  {
+    "timestamp": "2025-09-11 14:22:42.574",
+    "event_type": "PROGRESS",
+    "message": "進捗: 64.9% (61/94ステップ)",
+    "unix_time": 1757568162.574657
+  },
+  {
+    "timestamp": "2025-09-11 14:22:43.771",
+    "event_type": "PROGRESS",
+    "message": "進捗: 70.2% (66/94ステップ)",
+    "unix_time": 1757568163.7721157
+  },
+  {
+    "timestamp": "2025-09-11 14:22:44.986",
+    "event_type": "PROGRESS",
+    "message": "進捗: 75.5% (71/94ステップ)",
+    "unix_time": 1757568164.9876857
+  },
+  {
+    "timestamp": "2025-09-11 14:22:46.271",
+    "event_type": "PROGRESS",
+    "message": "進捗: 80.9% (76/94ステップ)",
+    "unix_time": 1757568166.2739844
+  },
+  {
+    "timestamp": "2025-09-11 14:22:47.525",
+    "event_type": "PROGRESS",
+    "message": "進捗: 86.2% (81/94ステップ)",
+    "unix_time": 1757568167.5272896
+  },
+  {
+    "timestamp": "2025-09-11 14:22:48.696",
+    "event_type": "PROGRESS",
+    "message": "進捗: 91.5% (86/94ステップ)",
+    "unix_time": 1757568168.6969824
+  },
+  {
+    "timestamp": "2025-09-11 14:22:49.865",
+    "event_type": "PROGRESS",
+    "message": "進捗: 96.8% (91/94ステップ)",
+    "unix_time": 1757568169.8697703
+  },
+  {
+    "timestamp": "2025-09-11 14:22:50.585",
+    "event_type": "MOVE",
+    "message": "経路実行完了: 94ステップ, 実行時間: 22.89秒",
+    "unix_time": 1757568170.5882752
+  },
+  {
+    "timestamp": "2025-09-11 14:22:51.599",
+    "event_type": "ALERT",
+    "message": "アラート検知: 'クリア！ ステップ数: 94'",
+    "unix_time": 1757568171.5993524
+  },
+  {
+    "timestamp": "2025-09-11 14:22:51.621",
+    "event_type": "ALERT",
+    "message": "アラートを閉じました",
+    "unix_time": 1757568171.6217885
+  },
+  {
+    "timestamp": "2025-09-11 14:22:51.621",
+    "event_type": "CLEAR",
+    "message": "ステージ 3 クリア！",
+    "unix_time": 1757568171.6243315
+  },
+  {
+    "timestamp": "2025-09-11 14:22:52.667",
+    "event_type": "END",
+    "message": "自動プレイ終了: 3/3ステージクリア, 総ステップ数: 0",
+    "unix_time": 1757568172.6700888
+  },
+  {
+    "timestamp": "2025-09-11 14:22:52.671",
+    "event_type": "SYSTEM",
+    "message": "セッション終了",
+    "unix_time": 1757568172.6737456
+  }
+]
